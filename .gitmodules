@@ -1,0 +1,3 @@
+[submodule "InventoryFrontEnd/src/react_helpers"]
+	path = InventoryFrontEnd/src/react_helpers
+	url = git@github.com:ThomasVy/ReactHelpers.git
