@@ -1,7 +1,5 @@
-import { useRef, useEffect, useCallback, useState } from 'react'
-import { useMutation, useQueryClient, useQuery } from 'react-query';
+import { useRef, useEffect } from 'react'
 import Input from '../react_helpers/Input'
-import { LoginForm, login } from '../api/backend'
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import axiosPrivate from '../api/axios';
@@ -15,18 +13,12 @@ function Login() {
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
 
-    const [inputValue, setInputValue] = useState<LoginForm>({ username: "", password: "" });
-    const [errMsg, setErrMsg] = useState<string>('');
-    const { username, password } = inputValue;
-
     const errRef = useRef<HTMLParagraphElement | null>(null);
+    const usernameRef = useRef<HTMLInputElement | null>(null);
+    const passwordRef = useRef<HTMLInputElement | null>(null);
 
-    const handleChange = useCallback((e) => {
-        const { id, value } = e.target;
-        setInputValue((prev) => ({
-        ...prev,
-        [id]: value,
-        }));
+    useEffect(() => {
+        usernameRef.current?.focus();
     }, []);
 
     const handleSubmit = async (e) => {
@@ -34,7 +26,7 @@ function Login() {
 
         try {
             const response = await axiosPrivate.post(LOGIN_URL,
-                JSON.stringify({ username, password })
+                JSON.stringify({ username: usernameRef.current?.value, password: passwordRef.current?.value })
             );
             console.log(JSON.stringify(response?.data));
             const data = response?.data;
@@ -45,25 +37,27 @@ function Login() {
             }
             navigate(from, { replace: true });
         } catch (err) {
+            if (!errRef.current)
+                return;
             if (!err?.response) {
-                setErrMsg('No Server Response');
+                errRef.current.innerText = 'No Server Response';
             } else if (err.response?.status === 400) {
-                setErrMsg('Missing Username or Password');
+                errRef.current.innerText = 'Missing Username or Password';
             } else if (err.response?.status === 401) {
-                setErrMsg('Unauthorized');
+                errRef.current.innerText = 'Unauthorized';
             } else {
-                setErrMsg('Login Failed');
+                errRef.current.innerText = 'Login Failed';
             }
             errRef?.current?.focus();
         }
     }
     return ( 
         <>
-            <p ref={errRef} aria-live="assertive">{errMsg}</p>
+            <p ref={errRef} aria-live="assertive"></p>
             <h1> Welcome Please Login </h1>
             <form onSubmit={handleSubmit}>
-                <Input type="text" value={username} id="username" label="username" onChange={handleChange}/>
-                <Input type="password" value={password} id="password" label="password" onChange={handleChange}/>
+                <Input type="text" id="username" label="username" ref={usernameRef} required/>
+                <Input type="password" id="password" label="password" ref={passwordRef} required autoComplete="true"/>
                 <input type="submit" value="Submit" />
             </form>
             <p>

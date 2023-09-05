@@ -1,12 +1,14 @@
 const User = require('../model/User');
 const jwt = require('jsonwebtoken');
-const { generateRefreshToken, generateAccessToken } = require('./generateToken');
+const { generateDefaultTokens } = require('./generateToken');
+const { clearRefreshCookie } = require('./cookiesHelpers');
+const { fillAuthResponse } = require('./responseHelpers');
 
 const handleRefreshToken = async (req, res) => {
     const cookies = req.cookies;
     if (!cookies?.refreshJWT) return res.sendStatus(201);
     const refreshToken = cookies.refreshJWT;
-    res.clearCookie('refreshJWT', { httpOnly: true, sameSite: 'None', secure: true });
+    clearRefreshCookie(res);
 
     const foundUser = await User.findOne({ refreshToken }).exec();
 
@@ -46,17 +48,13 @@ const handleRefreshToken = async (req, res) => {
             }
 
             // Refresh token was still valid
-            const user = { username: foundUser.username};
-            const accessToken = generateAccessToken(user, "15m");
-            const newRefreshToken = generateRefreshToken(user, "1h");
+            const { newAccessToken, newRefreshToken } = generateDefaultTokens(foundUser.username);
 
             // Saving refreshToken with current user
             foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
             const result = await foundUser.save();
 
-            // Creates Secure Cookie with refresh token
-            res.cookie('refreshJWT', newRefreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
-            res.json({ username: user.username, accessToken });
+            fillAuthResponse(res, user.username, newAccessToken, newRefreshToken);
         }
     );
 }

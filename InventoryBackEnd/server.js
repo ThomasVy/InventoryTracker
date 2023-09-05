@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require("express");
 const cors = require("cors")
 const app = express();
-const authRouter = require("./routes/auth");
 const corsOptions = require('./config/corsOptions');
 const verifyJWT = require('./middleware/verifyJWT');
 // const usersRouter = require("./routes/users");
@@ -29,7 +28,9 @@ app.use(express.json());
 //middleware for cookies
 app.use(cookieParser());
 
-app.use("/auth", authRouter);
+app.use("/auth", require("./routes/auth"));
+
+app.use('/register', require('./routes/register'));
 
 //verification routes
 //app.use(verifyJWT);

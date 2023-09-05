@@ -1,6 +1,8 @@
 const User = require('../model/User');
-const { generateRefreshToken, generateAccessToken } = require('./generateToken');
-//const bcrypt = require('bcrypt');
+const { generateDefaultTokens } = require('./generateToken');
+const { clearRefreshCookie } = require('./cookiesHelpers');
+const { fillAuthResponse } = require('./responseHelpers');
+const bcrypt = require('bcrypt');
 
 const handleLogin = async (req, res) => {
     const cookies = req.cookies;
@@ -14,16 +16,12 @@ const handleLogin = async (req, res) => {
         return res.sendStatus(401);
     }
     // evaluate password 
-    //const match = await bcrypt.compare(pwd, foundUser.password);
-    const match = password === foundUser.password;
+    const match = await bcrypt.compare(password, foundUser.password);
     if (!match) {
         return res.sendStatus(401);
     }
     // create JWTs
-    
-    const user = {username};
-    const accessToken = generateAccessToken(user, "15m");
-    const newRefreshToken = generateRefreshToken(user, "1h");
+    const { newAccessToken, newRefreshToken } = generateDefaultTokens(username);
 
     // Changed to let keyword
     let newRefreshTokenArray =
@@ -48,17 +46,14 @@ const handleLogin = async (req, res) => {
             newRefreshTokenArray = [];
         }
 
-        res.clearCookie('refreshJWT', { httpOnly: true, sameSite: 'None', secure: true });
+        clearRefreshCookie(res);
     }
 
     // Saving refreshToken with current user
     foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
     const result = await foundUser.save();
 
-    // Creates Secure Cookie with refresh token
-    res.cookie('refreshJWT', newRefreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
-    // Send authorization roles and access token to user
-    res.json({ username, accessToken });
+    fillAuthResponse(res, username, newAccessToken, newRefreshToken);
 }
 
 module.exports = handleLogin;

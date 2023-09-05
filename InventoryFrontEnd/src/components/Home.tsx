@@ -9,9 +9,6 @@ function Home() {
         else
             return null;
     };
-    const banner = () => {
-        
-    }
     return ( 
         <>
 

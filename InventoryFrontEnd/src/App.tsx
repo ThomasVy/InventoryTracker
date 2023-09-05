@@ -7,10 +7,12 @@ import "./styles.css"
 import Logout from './components/Logout.tsx';
 import useAuth from './hooks/useAuth.tsx';
 import RequireAuth from './components/RequireAuth.tsx';
-import OnlyLoggedInAccess from './components/OnlyLoggedInAccess.tsx';
-import { useEffect } from 'react';
+import Admin from './components/Admin.tsx';
+import { useEffect, useState } from 'react';
 import useRefreshToken from "./hooks/useRefreshToken";
 import { useLocation, useNavigate } from "react-router-dom";
+import Register from './components/Register.tsx';
+
 function NavBar()
 {
   const { auth } = useAuth();
@@ -36,6 +38,9 @@ function NavBar()
         <li>
           <NavLink to="/login">Login</NavLink>
         </li>
+        <li>
+          <NavLink to="/register">Register</NavLink>
+        </li>
       </>
     )
   }
@@ -60,35 +65,40 @@ function App() {
   const refresh = useRefreshToken();
   const location = useLocation();
   const navigate = useNavigate();
+  const [isLoading, setLoading] = useState<Boolean>(true);
 
   useEffect(() => {
     const refreshAccess = async () =>
     {
-      if (!didInit) {
-        didInit = true;
-        const from = location.pathname || "/";
-        await refresh();
-        navigate(from, { replace: true });
-      }
-    };
-    refreshAccess();
+      const from = location.pathname || "/";
+      await refresh();
+      setLoading(false);
+      navigate(from, { replace: true });
+    }
+    if (!didInit) {
+      didInit = true;
+      refreshAccess();
+    }
   }, []);
 
   const isLoggedIn = auth;
+  if (isLoading)
+  {
+    return <h2>Loading...</h2>;
+  }
   return (
     <>
       <Routes>
         <Route element={<NavBar />}>
-          <Route path="/login" element={isLoggedIn !== null ? <Navigate to="/" replace /> : <Login />}/>
-          <Route path="/logout" element={isLoggedIn ? <Logout /> : <Navigate to="/" replace /> }/>
-          <Route path="/" element={<Home />}/>
-          <Route path="/register" element={<Home />}/>
+            <Route path="/login" element={!isLoggedIn ? <Login /> : <Navigate to="/" replace /> }/>
+            <Route path="/logout" element={isLoggedIn ? <Logout /> : <Navigate to="/" replace /> }/>
+            <Route path="/register" element={!isLoggedIn ? <Register /> : <Navigate to="/" replace /> } />
+            <Route element={<RequireAuth/>}>
+              <Route path="/admin" element={<Admin />} />
+            </Route>
 
-          <Route element={<RequireAuth/>}>
-            <Route path="/admin" element={<OnlyLoggedInAccess />} />
-          </Route>
-
-          <Route path="*" element={<NotFound />}/>
+            <Route path="/" element={<Home />}/>
+            <Route path="*" element={<NotFound />}/>
         </Route>
       </Routes>
     </>

@@ -1,11 +1,11 @@
 import useAuth from "../hooks/useAuth";
 import { FunctionComponent } from "react";
 
-interface OnlyLoggedInAccessProps {
+interface AdminProps {
     
 }
  
-const OnlyLoggedInAccess : FunctionComponent<OnlyLoggedInAccessProps>  = ({}) => {
+const Admin : FunctionComponent<AdminProps>  = ({}) => {
     const { auth } = useAuth();
     return (  
         <>
@@ -16,4 +16,4 @@ const OnlyLoggedInAccess : FunctionComponent<OnlyLoggedInAccessProps>  = ({}) =>
     );
 }
  
-export default OnlyLoggedInAccess;
+export default Admin;
