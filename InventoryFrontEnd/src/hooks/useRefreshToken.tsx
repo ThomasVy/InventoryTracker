@@ -13,7 +13,6 @@ const useRefreshToken = () => {
                 if (setAuth) setAuth(null);
                 return null;
             }
-            console.log(response.data.accessToken);
             if (setAuth) setAuth({'username': response.data.username, 'accessToken': response.data.accessToken});
             return response.data.accessToken;
         } catch (error) {

@@ -54,7 +54,7 @@ const handleRefreshToken = async (req, res) => {
             foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
             const result = await foundUser.save();
 
-            fillAuthResponse(res, user.username, newAccessToken, newRefreshToken);
+            fillAuthResponse(res, foundUser.username, newAccessToken, newRefreshToken);
         }
     );
 }

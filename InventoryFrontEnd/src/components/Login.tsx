@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react'
-import Input from '../react_helpers/Input'
+import InputField from '../react_helpers/InputField'
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import axiosPrivate from '../api/axios';
@@ -56,8 +56,8 @@ function Login() {
             <p ref={errRef} aria-live="assertive"></p>
             <h1> Welcome Please Login </h1>
             <form onSubmit={handleSubmit}>
-                <Input type="text" id="username" label="username" ref={usernameRef} required/>
-                <Input type="password" id="password" label="password" ref={passwordRef} required autoComplete="true"/>
+                <InputField type="text" id="username" label="username" ref={usernameRef} required/>
+                <InputField type="password" id="password" label="password" ref={passwordRef} required autoComplete="true"/>
                 <input type="submit" value="Submit" />
             </form>
             <p>
