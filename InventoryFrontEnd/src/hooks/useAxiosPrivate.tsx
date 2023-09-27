@@ -1,4 +1,4 @@
-import { axiosPrivate } from "../api/axios";
+import axios from "../api/axios";
 import { useEffect } from "react";
 import useRefreshToken from "./useRefreshToken";
 import useAuth from "./useAuth";
@@ -9,7 +9,7 @@ const useAxiosPrivate = () => {
 
     useEffect(() => {
 
-        const requestIntercept = axiosPrivate.interceptors.request.use(
+        const requestIntercept = axios.interceptors.request.use(
             config => {
                 if (!config.headers['Authorization']) {
                     config.headers['Authorization'] = `Bearer ${auth?.accessToken}`;
@@ -18,7 +18,7 @@ const useAxiosPrivate = () => {
             }, (error) => Promise.reject(error)
         );
 
-        const responseIntercept = axiosPrivate.interceptors.response.use(
+        const responseIntercept = axios.interceptors.response.use(
             response => response,
             async (error) => {
                 const prevRequest = error?.config;
@@ -28,19 +28,19 @@ const useAxiosPrivate = () => {
                     if (newAccessToken == null) //Refresh token expired so we need to pass the error forward
                         return Promise.reject(error);
                     prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-                    return axiosPrivate(prevRequest);
+                    return axios(prevRequest);
                 }
                 return Promise.reject(error);
             }
         );
 
         return () => {
-            axiosPrivate.interceptors.request.eject(requestIntercept);
-            axiosPrivate.interceptors.response.eject(responseIntercept);
+            axios.interceptors.request.eject(requestIntercept);
+            axios.interceptors.response.eject(responseIntercept);
         }
     }, [auth, refresh, setAuth])
 
-    return axiosPrivate;
+    return axios;
 }
 
 export default useAxiosPrivate;

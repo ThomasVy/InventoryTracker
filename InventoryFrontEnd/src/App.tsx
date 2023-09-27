@@ -1,61 +1,19 @@
 
-import Login from './components/Login.tsx'
+import Login from './pages/Login.tsx'
 import { Routes, Route, NavLink, Outlet, Navigate } from "react-router-dom";
-import Home from './components/Home.tsx';
-import NotFound from './components/NotFound.tsx';
+import Home from './pages/Home.tsx';
+import NotFound from './pages/NotFound.tsx';
 import "./styles.css"
-import Logout from './components/Logout.tsx';
+import Logout from './pages/Logout.tsx';
 import useAuth from './hooks/useAuth.tsx';
 import RequireAuth from './components/RequireAuth.tsx';
-import Admin from './components/Admin.tsx';
+import Admin from './pages/Admin.tsx';
 import { useEffect, useState } from 'react';
 import useRefreshToken from "./hooks/useRefreshToken";
 import { useLocation, useNavigate } from "react-router-dom";
-import Register from './components/Register.tsx';
-
-function NavBar()
-{
-  const { auth } = useAuth();
-  const isLoggedIn = auth;
-
-  const loggedInNav = () => {
-    if (isLoggedIn)
-    {
-      return (
-        <>
-          <li>
-            <NavLink to="/logout">Logout</NavLink>
-            
-          </li>
-          <li>
-            <NavLink to="/admin">Admin</NavLink>
-          </li>
-        </>
-      );
-    }
-    return (
-      <>
-        <li>
-          <NavLink to="/login">Login</NavLink>
-        </li>
-        <li>
-          <NavLink to="/register">Register</NavLink>
-        </li>
-      </>
-    )
-  }
-  return(
-    <>
-      <nav>
-        <ul>
-          <li><NavLink to="/">Home</NavLink></li>
-          {loggedInNav()}
-        </ul>
-      </nav>
-      <Outlet />
-    </>
-  )
-}
+import Register from './pages/Register.tsx';
+import NavBar from './components/NavBar.tsx';
+import Inventory from './pages/Inventory.tsx';
 
 //https://react.dev/learn/you-might-not-need-an-effect#initializing-the-application
 let didInit = false;
@@ -95,6 +53,7 @@ function App() {
             <Route path="/register" element={!isLoggedIn ? <Register /> : <Navigate to="/" replace /> } />
             <Route element={<RequireAuth/>}>
               <Route path="/admin" element={<Admin />} />
+              <Route path="/inventory" element={<Inventory />} />
             </Route>
 
             <Route path="/" element={<Home />}/>

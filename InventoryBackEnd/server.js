@@ -33,8 +33,8 @@ app.use("/auth", require("./routes/auth"));
 app.use('/register', require('./routes/register'));
 
 //verification routes
-//app.use(verifyJWT);
-//// app.use("/users", authenticateTokenMiddleware, usersRouter);
+//// app.use("/users", verifyJWT, usersRouter);
+app.use("/inventory", require('./routes/inventory'));
 
 mongoose.connection.once('open', () => {
     console.log("Connected to MongoDB");
