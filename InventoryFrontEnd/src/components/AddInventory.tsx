@@ -1,7 +1,9 @@
 import { FunctionComponent, useRef } from "react";
 import InputField from "../react_helpers/InputField";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { useMutation, useQueryClient } from "react-query";
 import { INVENTORY_ADD_API, INVENTORY_REACT_QUERY_KEY, InventoryItemDetails } from "../data/InventoryConstants";
 interface AddInventoryProps {
 }
@@ -19,7 +21,12 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
             return axios.post(INVENTORY_ADD_API, JSON.stringify(item));
        },
        onSuccess: () => {
-        queryClient.invalidateQueries(INVENTORY_REACT_QUERY_KEY);
+            queryClient.invalidateQueries(INVENTORY_REACT_QUERY_KEY);
+
+            name.current.value = "";
+            stock.current.value = "";
+            cost.current.value = "";
+            reference.current.value = "";
        }
        
     });
@@ -44,7 +51,10 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
             <InputField ref={stock} type="number" label="stock"/>
             <InputField ref={cost} type="number" label="cost"/>
             <InputField ref={reference}type="text" label="reference"/>
-            <button disabled={newItemMutation.isLoading} onClick={(e) => handleAddInventory(e)}>Add Inventory</button>
+            <button disabled={newItemMutation.isLoading} onClick={(e) => handleAddInventory(e)}>
+                Add Inventory 
+                {newItemMutation.isLoading && <FontAwesomeIcon icon={faSpinner} spin />}
+            </button>
         </div>
 
      );

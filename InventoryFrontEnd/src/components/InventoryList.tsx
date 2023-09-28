@@ -16,16 +16,17 @@ const InventoryList: FunctionComponent<InventoryListProps> = () => {
 
     if (inventoryQuery.isLoading) return <h1>Loading...</h1>;
     if (inventoryQuery.isError) return <pre>{JSON.stringify(inventoryQuery.error)}</pre>;
-
+    if (inventoryQuery.data?.status == 204) return <h3>No inventories available</h3>;
     return (
         <div>
-            {inventoryQuery.data?.data.map((inventory) => (
+            {inventoryQuery.data?.data.map((item) => (
                 <InventoryItem 
-                    key={inventory.name}
-                    name={inventory.name}
-                    stock={inventory.stock}
-                    cost={inventory.cost}
-                    reference={inventory.reference}
+                    key={item._id}
+                    id={item._id}
+                    name={item.name}
+                    stock={item.stock}
+                    cost={item.cost}
+                    reference={item.reference}
                 />
             ))}
         </div>

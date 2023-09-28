@@ -14,7 +14,9 @@ Must begin with a letter.<br />\
 Letters, numbers, underscores, hyphens allowed.";
 const CONFIRM_PASSWORD_ERROR = "Passwords do not match";
 
-const Register: FunctionComponent<> = () => {
+interface RegisterProps {
+}
+const Register: FunctionComponent<RegisterProps> = () => {
 
     const usernameRef = useRef<HTMLInputElement>(null);
     const usernameErrorRef = useRef<HTMLParagraphElement>(null);
