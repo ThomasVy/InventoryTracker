@@ -1,6 +1,7 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   FormControl,
+  FormHelperText,
   IconButton,
   InputAdornment,
   InputLabel,
@@ -12,6 +13,8 @@ interface HiddenInputProps {
     label : string;
     id: string;
     autocomplete: string;
+    error? : boolean;
+    helperText? : string;
 }
 
 export type Ref = HTMLInputElement;
@@ -25,7 +28,7 @@ const HiddenInput = forwardRef<Ref, HiddenInputProps>((props, ref) => {
     event.preventDefault();
   };
   return (
-    <FormControl fullWidth sx={{ mt: 1 }} required variant="standard">
+    <FormControl error={props.error} fullWidth sx={{ mt: 1 }} required variant="standard">
       <InputLabel sx={{ ml: 2, mt: -0.5 }} htmlFor={props.id}>
         {props.label}
       </InputLabel>
@@ -48,6 +51,7 @@ const HiddenInput = forwardRef<Ref, HiddenInputProps>((props, ref) => {
         label={props.label}
         inputRef={ref}
       />
+      <FormHelperText>{props.helperText}</FormHelperText>
     </FormControl>
   );
 });

@@ -2,10 +2,11 @@ import { useRef, useState } from "react";
 import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import axiosPrivate from "../api/axios";
-import { Box, Button, Container, Grid, TextField, Link } from "@mui/material";
+import { Box, Button, Container, Grid, TextField, Link, Typography} from "@mui/material";
 import "src/assets/Input.css";
-import HiddenInput from "src/components/Password";
+import HiddenInput from "src/components/HiddenInput";
 import LoadingComponent from "src/components/LoadingComponent";
+import AlertMsg from "src/components/Alert";
 
 const LOGIN_URL = "/auth/login";
 
@@ -14,9 +15,9 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const from = location.state?.from?.pathname || "/";
 
-  const errRef = useRef<HTMLParagraphElement | null>(null);
   const usernameRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
@@ -38,23 +39,17 @@ function Login() {
       }
       navigate(from, { replace: true });
     } catch (err) {
-      if (!errRef.current) return;
       if (!err?.response) {
-        errRef.current.innerText = "No Server Response";
-      } else if (err.response?.status === 400) {
-        errRef.current.innerText = "Missing Username or Password";
-      } else if (err.response?.status === 401) {
-        errRef.current.innerText = "Unauthorized";
+        setErrorMsg("No Server Response");
       } else {
-        errRef.current.innerText = "Login Failed";
+        setErrorMsg("Verification Failed");
       }
-      errRef?.current?.focus();
     }
     setLoading(false);
   };
+
   return (
     <Container component="main" maxWidth="xs">
-      <p ref={errRef} aria-live="assertive"></p>
       <Box
         sx={{
           marginTop: 8,
@@ -63,7 +58,10 @@ function Login() {
           alignItems: "center",
         }}
       >
-        <h1> Login </h1>
+        <AlertMsg title="Login Failed" message={errorMsg} severity="error" />
+         <Typography component="h1" sx={{m: 2}} variant="h5">
+            Login
+        </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField
             required

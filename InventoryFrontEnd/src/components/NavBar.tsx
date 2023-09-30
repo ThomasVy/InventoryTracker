@@ -1,9 +1,9 @@
-
 import useAuth from "../hooks/useAuth";
 import {
   AppBar,
   Box,
   Button,
+  Container,
   IconButton,
   Menu,
   MenuItem,
@@ -16,10 +16,10 @@ import { useState } from "react";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { Link as RouterLink } from "react-router-dom";
 import useLogout from "src/hooks/useLogout";
-import LogoutIcon from '@mui/icons-material/Logout';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-import LoginIcon from '@mui/icons-material/Login';
-import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
+import LogoutIcon from "@mui/icons-material/Logout";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import LoginIcon from "@mui/icons-material/Login";
+import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 
 interface Link {
   title: string;
@@ -27,7 +27,7 @@ interface Link {
 }
 
 interface Settings extends Link {
-    icon: JSX.Element
+  icon: JSX.Element;
 }
 const commonLinks: Link[] = [{ title: "Home", link: "/" }];
 
@@ -40,12 +40,20 @@ const signedInPages: Link[] = [
 const signedOutPages: Link[] = [...commonLinks];
 
 const loggedInSettings: Settings[] = [
-    { title: "Account", link: "/account", icon: <ManageAccountsIcon sx={{ mr: 1 }}/> }
+  {
+    title: "Account",
+    link: "/account",
+    icon: <ManageAccountsIcon sx={{ mr: 1 }} />,
+  },
 ];
 
 const loggedOutSettings: Settings[] = [
-  { title: "Login", link: "/login", icon: <LoginIcon sx={{ mr: 1 }}/> },
-  { title: "Register", link: "/register", icon: <AppRegistrationIcon sx={{ mr: 1 }}/> },
+  { title: "Login", link: "/login", icon: <LoginIcon sx={{ mr: 1 }} /> },
+  {
+    title: "Register",
+    link: "/register",
+    icon: <AppRegistrationIcon sx={{ mr: 1 }} />,
+  },
 ];
 
 function Settings() {
@@ -191,10 +199,12 @@ function Main() {
 export default function NavBar() {
   return (
     <AppBar position="static">
-      <Toolbar>
-        <Main />
-        <Settings />
-      </Toolbar>
+      <Container maxWidth="xl">
+        <Toolbar>
+          <Main />
+          <Settings />
+        </Toolbar>
+      </Container>
     </AppBar>
   );
 }
