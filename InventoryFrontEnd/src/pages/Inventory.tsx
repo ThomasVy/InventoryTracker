@@ -10,6 +10,7 @@ const Inventory: FunctionComponent<InventoryProps> = () => {
     return (
         <>
             <AddInventory />
+            <h1>Inventory List</h1>
             <InventoryList />
         </>
     )

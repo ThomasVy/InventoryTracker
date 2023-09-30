@@ -1,17 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import axiosPrivate from '../api/axios';
-import useAuth from '../hooks/useAuth';
+import useAuth from './useAuth';
 
 const LOGOUT_URL = '/auth/logout';
 
-function Logout() {
+function useLogout() {
     const [errMsg, setErrMsg] = useState<string>('');
     const { setAuth } = useAuth();
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const sendLogoutRequest = async () => {
         try {
             const response = await axiosPrivate.get(LOGOUT_URL);
             if (response.status != 200 && response.status != 204)
@@ -30,12 +29,7 @@ function Logout() {
         if (setAuth) setAuth(null);
         navigate('/', { replace: true });
     };
-    return ( 
-    <>
-        {errMsg}
-        <button onClick={handleSubmit}>Signout</button>
-    </> 
-    );
+    return {sendLogoutRequest, errMsg};
 }
 
-export default Logout;
+export default useLogout;

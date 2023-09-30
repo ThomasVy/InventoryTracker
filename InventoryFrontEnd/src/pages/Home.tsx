@@ -1,19 +1,15 @@
+import { Typography } from '@mui/material';
 import useAuth from '../hooks/useAuth.tsx';
 
 function Home() {
     const { auth } = useAuth();
 
-    const welcomeMessageFunc = () => {
-        if (auth)
-            return (<p>Welcome {auth?.username}</p>);
-        else
-            return null;
-    };
+    if (auth){
+        return <Typography variant="h1" textAlign="center">Welcome {auth.username}</Typography>
+    }
     return ( 
         <>
-
-            {welcomeMessageFunc()}
-            <h1>Welcome! There is nothing here</h1>
+            <Typography variant="h1" textAlign="center">Welcome to the Home Page</Typography>
         </>
      );
 }

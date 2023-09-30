@@ -1,29 +1,28 @@
-import { useRef, useEffect } from "react";
-import InputField from "../react_helpers/InputField";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useRef, useState } from "react";
+import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import axiosPrivate from "../api/axios";
+import { Box, Button, Container, Grid, TextField, Link } from "@mui/material";
+import "src/assets/Input.css";
+import HiddenInput from "src/components/Password";
+import LoadingComponent from "src/components/LoadingComponent";
 
 const LOGIN_URL = "/auth/login";
 
 function Login() {
   const { setAuth } = useAuth();
-
   const navigate = useNavigate();
   const location = useLocation();
+  const [isLoading, setLoading] = useState<boolean>(false);
   const from = location.state?.from?.pathname || "/";
 
   const errRef = useRef<HTMLParagraphElement | null>(null);
   const usernameRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
-    usernameRef.current?.focus();
-  }, []);
-
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
-
     try {
       const response = await axiosPrivate.post(
         LOGIN_URL,
@@ -32,7 +31,6 @@ function Login() {
           password: passwordRef.current?.value,
         })
       );
-      console.log(JSON.stringify(response?.data));
       const data = response?.data;
 
       if (setAuth) {
@@ -52,37 +50,55 @@ function Login() {
       }
       errRef?.current?.focus();
     }
+    setLoading(false);
   };
   return (
-    <>
+    <Container component="main" maxWidth="xs">
       <p ref={errRef} aria-live="assertive"></p>
-      <h1> Welcome Please Login </h1>
-      <form onSubmit={handleSubmit}>
-        <InputField
-          type="text"
-          id="username"
-          label="username"
-          ref={usernameRef}
-          required
-        />
-        <InputField
-          type="password"
-          id="password"
-          label="password"
-          ref={passwordRef}
-          required
-          autoComplete="true"
-        />
-        <input type="submit" value="Submit" />
-      </form>
-      <p>
-        Need an Account?
-        <br />
-        <span className="line">
-          <Link to="/register">Sign Up</Link>
-        </span>
-      </p>
-    </>
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <h1> Login </h1>
+        <Box component="form" onSubmit={handleSubmit} noValidate>
+          <TextField
+            required
+            id="username"
+            label="Username"
+            inputRef={usernameRef}
+            fullWidth
+            autoComplete="username"
+            autoFocus
+          />
+
+          <HiddenInput
+            ref={passwordRef}
+            label="Password"
+            id="password"
+            autocomplete="current-password"
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            <LoadingComponent isLoading={isLoading}>Sign In</LoadingComponent>
+          </Button>
+          <Grid container>
+            <Grid item>
+              <Link component={RouterLink} to="/register">
+                Don't have an account? Register
+              </Link>
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
+    </Container>
   );
 }
 
