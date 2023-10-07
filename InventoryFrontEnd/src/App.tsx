@@ -1,42 +1,28 @@
-
-import Login from './pages/Login.tsx'
-import { Routes, Route, NavLink, Outlet, Navigate } from "react-router-dom";
-import Home from './pages/Home.tsx';
-import NotFound from './pages/NotFound.tsx';
-import "./styles.css"
-import useAuth from './hooks/useAuth.tsx';
-import RequireAuth from './components/RequireAuth.tsx';
-import Admin from './pages/Admin.tsx';
-import { useEffect, useState } from 'react';
+import Login from "./pages/Login.tsx";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Home from "./pages/Home.tsx";
+import NotFound from "./pages/NotFound.tsx";
+import "./styles.css";
+import useAuth from "./hooks/useAuth.tsx";
+import RequireAuth from "./components/RequireAuth.tsx";
+import Admin from "./pages/Admin.tsx";
+import { useEffect, useState } from "react";
 import useRefreshToken from "./hooks/useRefreshToken";
 import { useLocation, useNavigate } from "react-router-dom";
-import Register from './pages/Register.tsx';
-import NavBar from './components/NavBar.tsx';
-import Inventory from './pages/Inventory.tsx';
-import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import Register from "./pages/Register.tsx";
+import NavBar from "./components/NavBar/NavBar.tsx";
+import Inventory from "./pages/Inventory.tsx";
+import { Stack } from "@mui/material";
+import {
+  ADMIN_LINK,
+  INVENTORY_EDIT_LINK,
+  INVENTORY_LINK,
+  LOGIN_LINK,
+  REGISTER_LINK,
+} from "./data/LinkConstants.tsx";
+
 //https://react.dev/learn/you-might-not-need-an-effect#initializing-the-application
 let didInit = false;
-
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-  typography: {
-    fontFamily: [
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-      '"Apple Color Emoji"',
-      '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
-    ].join(','),
-  }
-});
-
 function App() {
   const { auth } = useAuth();
   const refresh = useRefreshToken();
@@ -45,13 +31,13 @@ function App() {
   const [isLoading, setLoading] = useState<Boolean>(true);
 
   useEffect(() => {
-    const refreshAccess = async () =>
-    {
+    const refreshAccess = async () => {
       const from = location.pathname || "/";
+      const searchParams = location.search || "";
       await refresh();
       setLoading(false);
-      navigate(from, { replace: true });
-    }
+      navigate({ pathname: from, search: searchParams }, { replace: true });
+    };
     if (!didInit) {
       didInit = true;
       refreshAccess();
@@ -59,29 +45,40 @@ function App() {
   }, []);
 
   const isLoggedIn = auth;
-  if (isLoading)
-  {
+  if (isLoading) {
     return <h2>Loading...</h2>;
   }
   return (
     <>
-     <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-        <NavBar />
+      <NavBar />
+      <Stack
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+        spacing={1}
+        marginTop={8}
+      >
         <Routes>
-              <Route path="/login" element={!isLoggedIn ? <Login /> : <Navigate to="/" replace /> }/>
-              <Route path="/register" element={!isLoggedIn ? <Register /> : <Navigate to="/" replace /> } />
-              <Route element={<RequireAuth/>}>
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/inventory" element={<Inventory />} />
-              </Route>
+          <Route
+            path={LOGIN_LINK.link}
+            element={!isLoggedIn ? <Login /> : <Navigate to="/" replace />}
+          />
+          <Route
+            path={REGISTER_LINK.link}
+            element={!isLoggedIn ? <Register /> : <Navigate to="/" replace />}
+          />
+          <Route element={<RequireAuth />}>
+            <Route path={ADMIN_LINK.link} element={<Admin />} />
+            <Route path={INVENTORY_LINK.link} element={<Inventory />} />
+            <Route path={INVENTORY_EDIT_LINK.link} element={<NotFound />} />
+          </Route>
 
-              <Route path="/" element={<Home />}/>
-              <Route path="*" element={<NotFound />}/>
+          <Route path="/" element={<Home />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
-      </ThemeProvider>
+      </Stack>
     </>
-  )
+  );
 }
 
 export default App;

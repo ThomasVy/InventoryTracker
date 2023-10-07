@@ -12,7 +12,7 @@ const AlertMsg: FunctionComponent<AlertMsgProps> = ({ message, severity, title }
 
   return (
     <>
-      <Alert variant="outlined" style={{width:'100%'}} severity={severity}>
+      <Alert sx={{ display: 'flex', justifyContent: 'center', width:'100%' }} variant="outlined" severity={severity}>
         <AlertTitle>{title}</AlertTitle>
         {message}
       </Alert>

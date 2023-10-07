@@ -1,9 +1,9 @@
 import { FunctionComponent, useRef } from "react";
-import InputField from "../react_helpers/InputField";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import InputField from "../../react_helpers/InputField";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useMutation, useQueryClient } from "react-query";
-import { INVENTORY_ADD_API, INVENTORY_REACT_QUERY_KEY, InventoryItemDetails } from "../data/InventoryConstants";
-import LoadingComponent from "./LoadingComponent";
+import { INVENTORY_ADD_API, INVENTORY_REACT_QUERY_KEY, InventoryItemDetails } from "../../data/InventoryConstants";
+import LoadingComponent from "../LoadingComponent";
 interface AddInventoryProps {
 }
 

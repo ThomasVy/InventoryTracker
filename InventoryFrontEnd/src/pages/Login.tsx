@@ -2,7 +2,15 @@ import { useRef, useState } from "react";
 import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import axiosPrivate from "../api/axios";
-import { Box, Button, Container, Grid, TextField, Link, Typography} from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  Grid,
+  TextField,
+  Link,
+  Typography,
+} from "@mui/material";
 import "src/assets/Input.css";
 import HiddenInput from "src/components/HiddenInput";
 import LoadingComponent from "src/components/LoadingComponent";
@@ -14,9 +22,11 @@ function Login() {
   const { setAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+  const searchParams = location.state?.from?.search  || "";
   const [isLoading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const from = location.state?.from?.pathname || "/";
+
 
   const usernameRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
@@ -37,7 +47,7 @@ function Login() {
       if (setAuth) {
         setAuth({ username: data?.username, accessToken: data?.accessToken });
       }
-      navigate(from, { replace: true });
+      navigate({pathname: from, search: searchParams}, { replace: true });
     } catch (err) {
       if (!err?.response) {
         setErrorMsg("No Server Response");
@@ -49,52 +59,51 @@ function Login() {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <AlertMsg title="Login Failed" message={errorMsg} severity="error" />
-         <Typography component="h1" sx={{m: 2}} variant="h5">
-            Login
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate>
-          <TextField
-            required
-            id="username"
-            label="Username"
-            inputRef={usernameRef}
-            fullWidth
-            autoComplete="username"
-            autoFocus
-          />
+    <Container
+      component="main"
+      maxWidth="xs"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems:"center"
+      }}
+    >
+      <AlertMsg title="Login Failed" message={errorMsg} severity="error" />
+      <Typography component="h1" sx={{ m: 2 }} variant="h5">
+        Login
+      </Typography>
+      <Box component="form" onSubmit={handleSubmit} noValidate>
+        <TextField
+          required
+          id="username"
+          label="Username"
+          inputRef={usernameRef}
+          fullWidth
+          autoComplete="username"
+          autoFocus
+        />
 
-          <HiddenInput
-            ref={passwordRef}
-            label="Password"
-            id="password"
-            autocomplete="current-password"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            <LoadingComponent isLoading={isLoading}>Sign In</LoadingComponent>
-          </Button>
-          <Grid container>
-            <Grid item>
-              <Link component={RouterLink} to="/register">
-                Don't have an account? Register
-              </Link>
-            </Grid>
+        <HiddenInput
+          ref={passwordRef}
+          label="Password"
+          id="password"
+          autocomplete="current-password"
+        />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+        >
+          <LoadingComponent isLoading={isLoading}>Sign In</LoadingComponent>
+        </Button>
+        <Grid container>
+          <Grid item>
+            <Link component={RouterLink} to="/register">
+              Don't have an account? Register
+            </Link>
           </Grid>
-        </Box>
+        </Grid>
       </Box>
     </Container>
   );

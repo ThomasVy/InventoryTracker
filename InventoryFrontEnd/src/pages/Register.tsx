@@ -85,11 +85,6 @@ const Register: FunctionComponent<RegisterProps> = () => {
     const username = usernameRef.current?.value;
     const password = passwordRef.current?.value;
     const confirmPassword = confirmPasswordRef.current?.value;
-    if (!username || !password || !confirmPassword) {
-      setMessage("Username, Password, or Confirm Password missing", ServerMessageType.Fail);
-      setLoading(false);
-      return;
-    }
 
     if (!isFormValid(username, password, confirmPassword)) {
       setMessage("Invalid Entry - One of the entries below do not meet the requirements", ServerMessageType.Fail);
@@ -120,15 +115,11 @@ const Register: FunctionComponent<RegisterProps> = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
+    <Container component="main" maxWidth="xs" sx={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems:"center"
+    }}>
         <AlertMsg
           title="Registration Failed"
           message={failedMsg}
@@ -187,7 +178,6 @@ const Register: FunctionComponent<RegisterProps> = () => {
             </Grid>
           </Grid>
         </Box>
-      </Box>
     </Container>
   );
 };

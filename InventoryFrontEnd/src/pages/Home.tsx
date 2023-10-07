@@ -3,7 +3,6 @@ import useAuth from '../hooks/useAuth.tsx';
 
 function Home() {
     const { auth } = useAuth();
-
     if (auth){
         return <Typography variant="h1" textAlign="center">Welcome {auth.username}</Typography>
     }
