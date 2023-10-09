@@ -1,6 +1,5 @@
 import { FunctionComponent } from "react";
 import { InventoryItemDetails } from "../../data/InventoryConstants";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useMutation, useQueryClient } from "react-query";
 import {
   INVENTORY_LIST_API,
@@ -8,10 +7,11 @@ import {
 } from "../../data/InventoryConstants";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { Box, Divider, Stack, TableCell, TableRow } from "@mui/material";
+import { TableCell, TableRow } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router-dom";
 import { INVENTORY_LINK } from "src/data/LinkConstants";
+import useInventoryRequest from "src/hooks/useInventoryRequest";
 
 const InventoryItem: FunctionComponent<InventoryItemDetails> = ({
   id,
@@ -20,12 +20,12 @@ const InventoryItem: FunctionComponent<InventoryItemDetails> = ({
   cost,
   reference,
 }) => {
-  const axios = useAxiosPrivate();
+  const inventoryRequest = useInventoryRequest();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const deleteMutation = useMutation({
     mutationFn: () => {
-      return axios.delete(`${INVENTORY_LIST_API}/${id}`);
+      return inventoryRequest.delete(`${INVENTORY_LIST_API}/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries([INVENTORY_REACT_QUERY_KEY]);

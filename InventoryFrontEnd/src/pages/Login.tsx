@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import axiosPrivate from "../api/axios";
+import authRequest from "../api/authRequest";
 import {
   Box,
   Button,
@@ -11,12 +11,11 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-import "src/assets/Input.css";
 import HiddenInput from "src/components/HiddenInput";
 import LoadingComponent from "src/components/LoadingComponent";
 import AlertMsg from "src/components/Alert";
 
-const LOGIN_URL = "/auth/login";
+const LOGIN_URL = "/login";
 
 function Login() {
   const { setAuth } = useAuth();
@@ -32,10 +31,10 @@ function Login() {
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
   const handleSubmit = async (e) => {
-    setLoading(true);
     e.preventDefault();
+    setLoading(true);
     try {
-      const response = await axiosPrivate.post(
+      const response = await authRequest.post(
         LOGIN_URL,
         JSON.stringify({
           username: usernameRef.current?.value,

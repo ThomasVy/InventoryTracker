@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosPrivate from "../api/axios";
+import axiosPrivate from "../api/authRequest";
 import useAuth from "./useAuth";
 
-const LOGOUT_URL = "/auth/logout";
+const LOGOUT_URL = "/logout";
 
 function useLogout() {
   const [errMsg, setErrMsg] = useState<string>("");

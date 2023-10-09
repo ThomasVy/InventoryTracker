@@ -1,6 +1,6 @@
 import { Link as RouterLink } from "react-router-dom";
 import { FunctionComponent, RefObject, useRef, useState } from "react";
-import axios from "../api/axios";
+import authRequest from "../api/authRequest";
 import { AxiosError } from "axios";
 import {
   Box,
@@ -93,7 +93,7 @@ const Register: FunctionComponent<RegisterProps> = () => {
     }
 
     try {
-      await axios.post(
+      await authRequest.post(
         REGISTER_URL,
         JSON.stringify({ username, password })
       );

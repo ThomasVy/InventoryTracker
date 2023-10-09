@@ -12,7 +12,7 @@ interface CreateCustomPaginationActionsProps {
   previousPage: number | undefined;
   nextPage: number | undefined;
   maxPage: number | undefined;
-  setPage: (newPage: number | undefined) => void;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 export const CreateCustomPaginationActions = ({
   previousPage, nextPage, maxPage, setPage,

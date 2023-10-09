@@ -1,0 +1,37 @@
+services:
+  frontend:
+    build:
+      context: InventoryFrontend
+      target: development
+    ports:
+      - 5173:5173
+    stdin_open: true
+    volumes:
+      - ./InventoryFrontend:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
+    depends_on:
+      - inventory-backend
+      - auth-backend
+
+  auth-backend:
+    restart: always
+    build:
+      context: Backends/AuthorizationBackend
+      target: development
+    volumes:
+      - ./Backends/AuthorizationBackend:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 3000:3000
+
+  inventory-backend:
+    restart: always
+    build:
+      context: Backends/InventoryBackend
+      target: development
+    volumes:
+      - ./Backends/InventoryBackend:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 4000:4000

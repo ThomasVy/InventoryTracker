@@ -1,15 +1,15 @@
-import axios from "../api/axios";
 import { useEffect } from "react";
 import useRefreshToken from "./useRefreshToken";
 import useAuth from "./useAuth";
+import { AxiosInstance } from "axios";
 
-const useAxiosPrivate = () => {
+const useAuthPrivateRequest = (requester: AxiosInstance) => {
     const refresh = useRefreshToken();
     const { auth, setAuth } = useAuth();
 
     useEffect(() => {
 
-        const requestIntercept = axios.interceptors.request.use(
+        const requestIntercept = requester.interceptors.request.use(
             config => {
                 if (!config.headers['Authorization']) {
                     config.headers['Authorization'] = `Bearer ${auth?.accessToken}`;
@@ -18,7 +18,7 @@ const useAxiosPrivate = () => {
             }, (error) => Promise.reject(error)
         );
 
-        const responseIntercept = axios.interceptors.response.use(
+        const responseIntercept = requester.interceptors.response.use(
             response => response,
             async (error) => {
                 const prevRequest = error?.config;
@@ -28,19 +28,19 @@ const useAxiosPrivate = () => {
                     if (newAccessToken == null) //Refresh token expired so we need to pass the error forward
                         return Promise.reject(error);
                     prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-                    return axios(prevRequest);
+                    return requester(prevRequest);
                 }
                 return Promise.reject(error);
             }
         );
 
         return () => {
-            axios.interceptors.request.eject(requestIntercept);
-            axios.interceptors.response.eject(responseIntercept);
+            requester.interceptors.request.eject(requestIntercept);
+            requester.interceptors.response.eject(responseIntercept);
         }
     }, [auth, refresh, setAuth])
 
-    return axios;
+    return requester;
 }
 
-export default useAxiosPrivate;
+export default useAuthPrivateRequest;

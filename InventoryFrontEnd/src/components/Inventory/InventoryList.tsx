@@ -1,7 +1,6 @@
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useState } from "react";
 import InventoryItem from "./InventoryItem";
 import { useQuery, useQueryClient } from "react-query";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import {
   INVENTORY_LIMIT_REACT_QUERY_KEY,
   INVENTORY_LIST_API,
@@ -20,6 +19,7 @@ import {
   TableRow,
 } from "@mui/material";
 import { CreateCustomPaginationActions } from "../CreateCustomPaginationActions";
+import useInventoryRequest from "src/hooks/useInventoryRequest";
 
 interface InventoryListProps {}
 
@@ -34,7 +34,7 @@ export interface TablePaginationActionsProps {
 }
 
 const InventoryList: FunctionComponent<InventoryListProps> = () => {
-  const privateApi = useAxiosPrivate();
+  const inventoryRequest = useInventoryRequest();
   const queryClient = useQueryClient();
   const [limit, setLimit] = useState<number>(5);
   const [page, setPage] = useState<number>(1);
@@ -47,7 +47,7 @@ const InventoryList: FunctionComponent<InventoryListProps> = () => {
       limit,
     ],
     queryFn: () => {
-      return privateApi.get(
+      return inventoryRequest.get(
         `${INVENTORY_LIST_API}?page=${page}&limit=${limit}`
       );
     },
@@ -99,7 +99,6 @@ const InventoryList: FunctionComponent<InventoryListProps> = () => {
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                colSpan={1}
                 count={totalItems}
                 rowsPerPage={limit}
                 page={page - 1}

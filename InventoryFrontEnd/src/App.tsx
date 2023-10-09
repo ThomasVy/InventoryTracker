@@ -2,7 +2,6 @@ import Login from "./pages/Login.tsx";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import "./styles.css";
 import useAuth from "./hooks/useAuth.tsx";
 import RequireAuth from "./components/RequireAuth.tsx";
 import Admin from "./pages/Admin.tsx";
@@ -29,14 +28,19 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoading, setLoading] = useState<Boolean>(true);
-
+  
   useEffect(() => {
     const refreshAccess = async () => {
       const from = location.pathname || "/";
       const searchParams = location.search || "";
-      await refresh();
-      setLoading(false);
-      navigate({ pathname: from, search: searchParams }, { replace: true });
+      try{
+        await refresh();
+        setLoading(false);
+        navigate({ pathname: from, search: searchParams }, { replace: true });
+      }
+      catch(e){
+        setLoading(false);
+      }
     };
     if (!didInit) {
       didInit = true;
