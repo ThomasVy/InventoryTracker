@@ -10,3 +10,4 @@ export const HOME_LINK: Link = { title: "Home", link: "/" };
 export const ACCOUNT_LINK: Link = { title: "Account", link: "/account" };
 export const LOGIN_LINK: Link = { title: "Login", link: "/login" };
 export const REGISTER_LINK: Link = { title: "Register", link: "/register" };
+export const PURCHASE_LINK: Link = { title: "Purchase", link: "/purchase" };

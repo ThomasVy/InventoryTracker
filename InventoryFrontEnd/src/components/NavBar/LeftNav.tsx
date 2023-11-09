@@ -22,7 +22,7 @@ const signedInPages: Link[] = [
 
 const signedOutPages: Link[] = [...commonLinks];
 
-function NavButtons() {
+function LeftNav() {
   const { auth } = useAuth();
   const isLoggedIn = auth;
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -94,4 +94,4 @@ function NavButtons() {
   );
 }
 
-export default NavButtons;
+export default LeftNav;

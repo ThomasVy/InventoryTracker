@@ -6,23 +6,21 @@ type Props = {
 
 interface Auth{
     username : string;
-    accessToken: string | null;
+    accessToken: string;
 };
 
 interface AuthState
 {
     auth: Auth | null;
-    setAuth : React.Dispatch<React.SetStateAction<Auth | null>> | null;
+    setAuth : React.Dispatch<React.SetStateAction<Auth | null>>;
 };
 
-const defaultAuthState : AuthState = {auth: null, setAuth : null};
-const AuthContext = createContext<AuthState>(defaultAuthState);
+const AuthContext = createContext<AuthState>({} as AuthState);
 
 export const AuthProvider = ({ children } : Props) => {
     const [auth, setAuth] = useState<Auth | null>(null);
-    const state : AuthState = {auth, setAuth};
     return (
-        <AuthContext.Provider value={ state }>
+        <AuthContext.Provider value={ {auth, setAuth} }>
             {children}
         </AuthContext.Provider>
     )

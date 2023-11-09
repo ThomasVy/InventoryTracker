@@ -1,6 +1,6 @@
 import { AppBar, Container, Toolbar } from "@mui/material";
-import NavButtons from "./NavButtons";
-import Settings from "./Settings";
+import LeftNav from "./LeftNav";
+import RightNav from "./RightNav";
 
 function NavBar() {
   return (
@@ -8,8 +8,8 @@ function NavBar() {
       <AppBar position="static">
         <Container maxWidth="xl">
           <Toolbar>
-            <NavButtons />
-            <Settings/>
+            <LeftNav />
+            <RightNav />
           </Toolbar>
         </Container>
       </AppBar>

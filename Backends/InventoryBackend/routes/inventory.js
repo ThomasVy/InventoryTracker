@@ -1,9 +1,13 @@
 const express = require("express")
 const router = express.Router()
 const Inventory = require('../model/Inventory');
-const {paginationResultsForUser} = require('../middleware/pagination')
+const {paginationResultsForUser} = require('../middleware/pagination');
+const getUserObjectFromModel = require("../middleware/getUserObjectFromModel");
 
-router.get("/", paginationResultsForUser(Inventory, "inventory"), require('../controllers/InventoryControllers/listInventoryController'));
-router.delete("/:itemId", require('../controllers/InventoryControllers/deleteItemController'));
+const getUserObjectFromInventory = getUserObjectFromModel(Inventory);
+
+router.get("/", getUserObjectFromInventory, paginationResultsForUser("inventory"), require('../controllers/InventoryControllers/listInventoryController'));
+router.delete("/:itemId", getUserObjectFromInventory, require('../controllers/InventoryControllers/deleteItemController'));
 router.post("/add", require('../controllers/InventoryControllers/addInventoryController'));
+router.get("/:itemId", getUserObjectFromInventory, require('../controllers/InventoryControllers/getItemController'))
 module.exports = router;

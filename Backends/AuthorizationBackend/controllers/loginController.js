@@ -21,7 +21,7 @@ const handleLogin = async (req, res) => {
         return res.sendStatus(401);
     }
     // create JWTs
-    const { newAccessToken, newRefreshToken } = generateDefaultTokens(username);
+    const { newAccessToken, newRefreshToken } = generateDefaultTokens(foundUser.id);
 
     // Changed to let keyword
     let newRefreshTokenArray =

@@ -1,22 +1,19 @@
 const Inventory = require('../../model/Inventory');
 
 const handleDeleteItem = async (req, res) => {
-    const {user} = req;
-    const {itemId} = req.params;
-    if (!user || !itemId) return res.sendStatus(403);
+    const itemId = parseInt(req.params.itemId);
+    if (isNaN(itemId)) return res.sendStatus(404);
 
-    const usersInventory = await Inventory.findOne({user});
-    if (!usersInventory) return res.sendStatus(404);
-    const newInventory = usersInventory.inventory.filter(item=> {
-        return item._id.toString() !== itemId;
+    const newInventory = req.userObject.inventory.filter(item=> {
+        return item.itemId !== itemId;
     });
     if (newInventory.length === 0) {
         console.log("Empty inventory - deleting entry from DB")
-        await usersInventory.deleteOne();
+        await req.userObject.deleteOne();
         return res.sendStatus(200);
     }
-    usersInventory.inventory = newInventory;
-    const result = await usersInventory.save();
+    req.userObject.inventory = newInventory;
+    const result = await req.userObject.save();
     return res.sendStatus(200);
 }
 module.exports = handleDeleteItem;

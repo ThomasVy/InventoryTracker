@@ -11,6 +11,7 @@ const credentials = require('./common/middleware/credentials');
 
 const PORT = 4000
 connectDB(process.env.DATABASE_URI);
+app.use(express.static('public'));
 
 app.use(credentials);
 app.use(cors(corsOptions));

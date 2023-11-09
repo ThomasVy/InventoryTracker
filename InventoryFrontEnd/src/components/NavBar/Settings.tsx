@@ -5,6 +5,7 @@ import {
   Menu,
   MenuItem,
   Typography,
+  Badge,
 } from "@mui/material";
 import { FunctionComponent, useState } from "react";
 import useAuth from "src/hooks/useAuth";
@@ -54,46 +55,44 @@ const Settings: FunctionComponent<SettingsProps> = () => {
   if (isLoggedIn) {
     return (
       <>
-        <Box sx={{ flexGrow: 0, display: { xs: "flex" } }}>
-          <Tooltip title="Open settings">
-            <IconButton onClick={handleOpenUserMenu}>
-              <SettingsIcon />
-            </IconButton>
-          </Tooltip>
-          <Menu
-            sx={{ mt: "45px" }}
-            id="menu-appbar"
-            anchorEl={anchorElUser}
-            anchorOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            open={Boolean(anchorElUser)}
-            onClose={handleCloseUserMenu}
-          >
-            <AlertMsg title="Logout Failed" message={errMsg} severity="error" />
-            {loggedInSettings.map((setting) => (
-              <MenuItem
-                component={RouterLink}
-                to={setting.link}
-                key={setting.title}
-                onClick={handleCloseUserMenu}
-              >
-                {setting.icon}
-                <Typography textAlign="center">{setting.title}</Typography>
-              </MenuItem>
-            ))}
-            <MenuItem onClick={() => sendLogoutRequest()}>
-              <LogoutIcon sx={{ mr: 1 }} />
-              <Typography textAlign="center">Logout</Typography>
+        <Tooltip title="Open settings">
+          <IconButton onClick={handleOpenUserMenu}>
+            <SettingsIcon />
+          </IconButton>
+        </Tooltip>
+        <Menu
+          sx={{ mt: "45px" }}
+          id="menu-appbar"
+          anchorEl={anchorElUser}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={Boolean(anchorElUser)}
+          onClose={handleCloseUserMenu}
+        >
+          <AlertMsg title="Logout Failed" message={errMsg} severity="error" />
+          {loggedInSettings.map((setting) => (
+            <MenuItem
+              component={RouterLink}
+              to={setting.link}
+              key={setting.title}
+              onClick={handleCloseUserMenu}
+            >
+              {setting.icon}
+              <Typography textAlign="center">{setting.title}</Typography>
             </MenuItem>
-          </Menu>
-        </Box>
+          ))}
+          <MenuItem onClick={() => sendLogoutRequest()}>
+            <LogoutIcon sx={{ mr: 1 }} />
+            <Typography textAlign="center">Logout</Typography>
+          </MenuItem>
+        </Menu>
       </>
     );
   }

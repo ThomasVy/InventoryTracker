@@ -2,12 +2,12 @@ import { FunctionComponent, useState } from "react";
 import InventoryItem from "./InventoryItem";
 import { useQuery, useQueryClient } from "react-query";
 import {
-  INVENTORY_LIMIT_REACT_QUERY_KEY,
   INVENTORY_LIST_API,
-  INVENTORY_PAGE_LIMIT,
-  INVENTORY_REACT_QUERY_KEY,
+  INVENTORY_LIST_REACT_QUERY_KEY,
+  INVENTORY_REACT_QUERY_KEY
 } from "../../data/InventoryConstants";
 import {
+  CircularProgress,
   Paper,
   Table,
   TableBody,
@@ -40,11 +40,7 @@ const InventoryList: FunctionComponent<InventoryListProps> = () => {
   const [page, setPage] = useState<number>(1);
   const { isLoading, isError, error, data } = useQuery({
     queryKey: [
-      INVENTORY_REACT_QUERY_KEY,
-      INVENTORY_PAGE_LIMIT,
-      page,
-      INVENTORY_LIMIT_REACT_QUERY_KEY,
-      limit,
+      INVENTORY_REACT_QUERY_KEY
     ],
     queryFn: () => {
       return inventoryRequest.get(
@@ -57,12 +53,12 @@ const InventoryList: FunctionComponent<InventoryListProps> = () => {
   ) => {
     setPage(1);
     setLimit(parseInt(event.target.value, 10));
-    queryClient.invalidateQueries([{ limit }]);
+    queryClient.invalidateQueries({queryKey: [INVENTORY_REACT_QUERY_KEY], exact: true});
   };
 
-  if (isLoading) return <h1>Loading...</h1>;
+  if (isLoading) return <CircularProgress />;
   if (isError) return <pre>{JSON.stringify(error)}</pre>;
-  if (data?.status == 201) return <h3>No inventories available</h3>;
+  if (data?.status == 204) return <h3>No inventories available</h3>;
   const { results, previousPage, nextPage, maxPage, totalItems } = data?.data;
   const CustomPaginationActions = CreateCustomPaginationActions({
     previousPage,
@@ -72,26 +68,33 @@ const InventoryList: FunctionComponent<InventoryListProps> = () => {
   });
   return (
     <>
-      <TableContainer component={Paper} sx={{ maxWidth: "50vw" }}>
+      <TableContainer component={Paper} sx={{ maxWidth: "60vw" }}>
         <Table aria-label="simple table">
+          <colgroup>
+              <col style={{width:'5%'}}/>
+              <col style={{width:'25%'}}/>
+              <col style={{width:'5%'}}/>
+              <col style={{width:'10%'}}/>
+              <col style={{width:'10%'}}/>
+              <col style={{width:'20%'}}/>
+              <col style={{width:'30%'}}/>
+          </colgroup>
           <TableHead>
             <TableRow>
+              <TableCell>ID</TableCell>
               <TableCell>Item Name</TableCell>
+              <TableCell align="left">Reference</TableCell>
+              <TableCell align="left">Type</TableCell>
               <TableCell align="left">Stock</TableCell>
               <TableCell align="left">Cost&nbsp;($)</TableCell>
-              <TableCell align="left">Reference</TableCell>
               <TableCell align="left">Modify</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {results.map((item) => (
               <InventoryItem
-                key={item._id}
-                id={item._id}
-                name={item.name}
-                stock={item.stock}
-                cost={item.cost}
-                reference={item.reference}
+                key={item.itemId}
+                {...item}
               />
             ))}
           </TableBody>

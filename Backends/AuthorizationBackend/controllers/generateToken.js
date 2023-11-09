@@ -13,9 +13,9 @@ function generateRefreshToken(data, expiresIn)
     return jwt.sign(data, process.env.REFRESH_TOKEN_SECRET, { expiresIn });   
 }
 
-function generateDefaultTokens(username)
+function generateDefaultTokens(id)
 {
-    const user = {username};
+    const user = {id};
     return {
         newAccessToken : generateAccessToken(user, ACCESS_TOKEN_EXPIRES_IN),
         newRefreshToken : generateRefreshToken(user, REFRESH_TOKEN_EXPIRES_IN)

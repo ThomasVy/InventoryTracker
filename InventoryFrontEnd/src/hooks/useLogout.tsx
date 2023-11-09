@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosPrivate from "../api/authRequest";
 import useAuth from "./useAuth";
+import useShoppingCart from "./useShoppingCart";
 
 const LOGOUT_URL = "/logout";
 
 function useLogout() {
   const [errMsg, setErrMsg] = useState<string>("");
   const { setAuth } = useAuth();
-  const navigate = useNavigate();
+  const {clearShoppingCart} = useShoppingCart();
 
   const sendLogoutRequest = async () => {
     try {
@@ -22,8 +23,8 @@ function useLogout() {
         setErrMsg(`No refresh token was supplied`);
         return;
       }
-      if (setAuth) setAuth(null);
-      navigate("/", { replace: true });
+      clearShoppingCart();
+      setAuth(null);
     } catch (error) {
       setErrMsg("Could not reach server");
       return;

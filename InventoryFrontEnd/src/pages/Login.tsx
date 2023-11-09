@@ -42,11 +42,7 @@ function Login() {
         })
       );
       const data = response?.data;
-
-      if (setAuth) {
-        setAuth({ username: data?.username, accessToken: data?.accessToken });
-      }
-      navigate({pathname: from, search: searchParams}, { replace: true });
+      setAuth({ username: data?.username, accessToken: data?.accessToken });
     } catch (err) {
       if (!err?.response) {
         setErrorMsg("No Server Response");

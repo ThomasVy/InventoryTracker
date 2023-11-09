@@ -10,10 +10,10 @@ const useRefreshToken = () => {
         try {
             const response = await authRequest.get(REFRESH_URI);
             if (response.status == 201){
-                if (setAuth) setAuth(null);
+                setAuth(null);
                 return null;
             }
-            if (setAuth) setAuth({'username': response.data.username, 'accessToken': response.data.accessToken});
+            setAuth({'username': response.data.username, 'accessToken': response.data.accessToken});
             return response.data.accessToken;
         } catch (error) {
             console.log(`Error ${error}`);

@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthProvider.tsx";
 import { QueryClientProvider, QueryClient } from "react-query";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import { ShoppingCartProvider } from "./context/ShoppingCartProvider.tsx";
 
 const FIVE_MINUTES = 1000 * 60 * 5;
 const queryClient = new QueryClient({
@@ -33,15 +34,17 @@ const darkTheme = createTheme({
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider theme={darkTheme}>
-            <CssBaseline />
-            <App />
-          </ThemeProvider>
-        </QueryClientProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <AuthProvider>
+          <ShoppingCartProvider>
+            <QueryClientProvider client={queryClient}>
+              <App />
+            </QueryClientProvider>
+          </ShoppingCartProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   </React.StrictMode>
 );
