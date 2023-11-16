@@ -15,7 +15,7 @@ function paginationResultsForUser(attribute) {
             limit = DEFAULT_LIMIT;
         }
         const selectedArray = req.userObject[attribute];
-        if (!selectedArray) return res.status(404).json("No inventory items available");
+        if (!selectedArray) return res.status(204).json("No inventory items available");
 
         if (limit < 0) {
             limit = selectedArray.length;
@@ -41,7 +41,7 @@ function paginationResultsForUser(attribute) {
         if (startIndex > 0 ){
             results.previousPage = page - 1;
         }
-        results.results = selectedArray.slice(startIndex, endIndex);
+        results.results = selectedArray.slice(startIndex, endIndex).map(item => item.itemId);
         req.paginationResults = results;
         next();
     };

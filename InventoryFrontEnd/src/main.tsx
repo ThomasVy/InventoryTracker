@@ -3,9 +3,12 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthProvider.tsx";
-import { QueryClientProvider, QueryClient } from "react-query";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { ShoppingCartProvider } from "./context/ShoppingCartProvider.tsx";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const FIVE_MINUTES = 1000 * 60 * 5;
 const queryClient = new QueryClient({
@@ -38,11 +41,13 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       <CssBaseline />
       <BrowserRouter>
         <AuthProvider>
-          <ShoppingCartProvider>
-            <QueryClientProvider client={queryClient}>
+          <QueryClientProvider client={queryClient}>
+            <ToastContainer />
+            <ReactQueryDevtools />
+            <ShoppingCartProvider>
               <App />
-            </QueryClientProvider>
-          </ShoppingCartProvider>
+            </ShoppingCartProvider>
+          </QueryClientProvider>
         </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>

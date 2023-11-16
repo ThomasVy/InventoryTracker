@@ -1,7 +1,8 @@
-import { FunctionComponent, useRef } from "react";
-import { useMutation, useQueryClient } from "react-query";
+import { FunctionComponent, useRef, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   INVENTORY_ADD_API,
+  INVENTORY_ALL_REACT_QUERY_KEY,
   INVENTORY_REACT_QUERY_KEY,
   InventoryItemDetails,
 } from "../../data/InventoryConstants";
@@ -18,12 +19,14 @@ import { LoadingButton } from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
 import useInventoryRequest from "src/hooks/useInventoryRequest";
 import Alert from "../Alert";
+import CurrencyInput from "../CurrencyInput";
+import WholeNumberInput from "../WholeNumberInput";
 interface AddInventoryProps {}
 
 const AddInventory: FunctionComponent<AddInventoryProps> = () => {
   const name = useRef<HTMLInputElement>();
-  const stock = useRef<HTMLInputElement>();
-  const cost = useRef<HTMLInputElement>();
+  const [stock, setStock] = useState<string>("");
+  const [cost, setCost] = useState<string>("");
   const reference = useRef<HTMLInputElement>();
   const type = useRef<HTMLInputElement>();
 
@@ -35,11 +38,11 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
       return inventoryRequest.post(INVENTORY_ADD_API, JSON.stringify(item));
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: [INVENTORY_REACT_QUERY_KEY], exact: true})
+      queryClient.invalidateQueries({queryKey: [INVENTORY_ALL_REACT_QUERY_KEY]})
 
+      setStock("");
+      setCost("");
       name.current.value = "";
-      stock.current.value = "";
-      cost.current.value = "";
       reference.current.value = "";
       type.current.value = "Poster";
     },
@@ -49,15 +52,15 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
   ) => {
     e.preventDefault();
     if (!name.current) return;
-    if (!stock.current) return;
-    if (!cost.current) return;
+    if (!stock) return;
+    if (!cost) return;
     if (!reference.current) return;
     if (!type.current) return;
     newItemMutation.mutate({
       itemId: -1,
       name: name.current?.value,
-      stock: stock.current.valueAsNumber,
-      cost: cost.current.valueAsNumber,
+      stock: parseInt(stock),
+      cost: parseInt(cost),
       reference: reference.current.value,
       type: type.current.value,
     });
@@ -74,18 +77,18 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
     >
       {newItemMutation.isError && <Alert title="Add Error" message={JSON.stringify(newItemMutation.error)} severity="error"/>}
       <TextField required inputRef={name} label="Name" />
-      <TextField required inputRef={stock} type="number" label="Stock" />
-      <FormControl required fullWidth sx={{ m: 1 }}>
-        <InputLabel htmlFor="cost">Cost</InputLabel>
-        <OutlinedInput
-          id="cost"
-          type="Number"
-          inputRef={cost}
-          startAdornment={<InputAdornment position="start">$</InputAdornment>}
-          label="Amount"
-        />
-      </FormControl>
-
+      <WholeNumberInput textFieldProps={{
+            label: "Stock",
+            required: true,
+          }}
+          setInput={setStock}
+          input={stock} />
+      <CurrencyInput textFieldProps={{
+            label: "Cost",
+            required: true,
+          }}
+          setInput={setCost}
+          input={cost} />
       <TextField
         select
         required

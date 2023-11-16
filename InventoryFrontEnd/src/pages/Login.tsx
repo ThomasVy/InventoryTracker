@@ -13,23 +13,17 @@ import {
 } from "@mui/material";
 import HiddenInput from "src/components/HiddenInput";
 import LoadingComponent from "src/components/LoadingComponent";
-import AlertMsg from "src/components/Alert";
+import { showToast } from "src/utilities/toast";
 
 const LOGIN_URL = "/login";
 
 function Login() {
   const { setAuth } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || "/";
-  const searchParams = location.state?.from?.search  || "";
   const [isLoading, setLoading] = useState<boolean>(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
 
   const usernameRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -45,9 +39,9 @@ function Login() {
       setAuth({ username: data?.username, accessToken: data?.accessToken });
     } catch (err) {
       if (!err?.response) {
-        setErrorMsg("No Server Response");
+        showToast("No Server Response");
       } else {
-        setErrorMsg("Verification Failed");
+        showToast("Verification Failed");
       }
     }
     setLoading(false);
@@ -63,7 +57,6 @@ function Login() {
         alignItems:"center"
       }}
     >
-      <AlertMsg title="Login Failed" message={errorMsg} severity="error" />
       <Typography component="h1" sx={{ m: 2 }} variant="h5">
         Login
       </Typography>

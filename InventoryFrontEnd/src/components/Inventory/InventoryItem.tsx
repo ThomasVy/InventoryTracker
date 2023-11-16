@@ -1,111 +1,60 @@
 import { FunctionComponent } from "react";
-import {
-  INVENTORY_LIST_REACT_QUERY_KEY,
-  InventoryItemDetails,
-} from "../../data/InventoryConstants";
-import { useMutation, useQueryClient } from "react-query";
+
+import { useQuery } from "@tanstack/react-query";
 import {
   INVENTORY_LIST_API,
   INVENTORY_REACT_QUERY_KEY,
 } from "../../data/InventoryConstants";
-import DeleteIcon from "@mui/icons-material/Delete";
-import LoadingButton from "@mui/lab/LoadingButton";
-import { Box, Button, IconButton, TableCell, TableRow } from "@mui/material";
+
+import {
+  Box,
+  Button,
+  CircularProgress,
+  TableCell,
+  TableRow,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
 import { INVENTORY_LINK } from "src/data/LinkConstants";
 import useInventoryRequest from "src/hooks/useInventoryRequest";
-import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import useShoppingCart from "src/hooks/useShoppingCart";
-import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
-import RemoveIcon from "@mui/icons-material/Remove";
-import AddIcon from "@mui/icons-material/Add";
+import ModifyShoppingCartQuantityButtons from "../ShoppingCart/ModifyShoppingCartQuantityButtons";
+import { formatCurrency } from "src/utilities/formatCurrency";
+import DeleteInventoryItem from "./DeleteInventoryItem";
 
-interface AddToCartButtonsProps {
-  itemId: number;
+interface InventoryItemProps {
+  id: number;
 }
 
-const AddToCartButtons: FunctionComponent<AddToCartButtonsProps> = ({
-  itemId,
-}) => {
-  const {
-    getItemQuantity,
-    increaseCartQuantity,
-    decreaseCartQuantity,
-    removeFromCart,
-  } = useShoppingCart();
-  const itemQuantity = getItemQuantity(itemId);
-  if (itemQuantity === 0) {
-    return (
-      <>
-        <IconButton onClick={() => increaseCartQuantity(itemId)}>
-          <AddShoppingCartIcon sx={{ color: "green" }} />
-        </IconButton>
-      </>
-    );
-  }
-  return (
-    <>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-        }}
-      >
-        <IconButton onClick={() => removeFromCart(itemId)}>
-          <RemoveShoppingCartIcon sx={{ color: "red" }} />
-        </IconButton>
-        <IconButton onClick={() => decreaseCartQuantity(itemId)}>
-          <RemoveIcon />
-        </IconButton>
-        {itemQuantity}
-        <IconButton onClick={() => increaseCartQuantity(itemId)}>
-          <AddIcon />
-        </IconButton>
-      </Box>
-    </>
-  );
-};
-
-const InventoryItem: FunctionComponent<InventoryItemDetails> = ({
-  itemId,
-  name,
-  stock,
-  cost,
-  reference,
-  type,
-}) => {
+const InventoryItem: FunctionComponent<InventoryItemProps> = ({ id }) => {
   const inventoryRequest = useInventoryRequest();
-  const queryClient = useQueryClient();
-  queryClient.setQueryData([INVENTORY_REACT_QUERY_KEY, itemId], {
-    itemId,
-    name,
-    stock,
-    cost,
-    reference,
-    type,
-  });
-  const deleteMutation = useMutation({
-    mutationFn: () => {
-      return inventoryRequest.delete(`${INVENTORY_LIST_API}/${itemId}`);
+  const { isLoading, isError, error, data } = useQuery({
+    queryKey: [INVENTORY_REACT_QUERY_KEY, `${id}`],
+    queryFn: () => {
+      return inventoryRequest.get(`${INVENTORY_LIST_API}/${id}`);
     },
-    onSuccess: () =>
-      Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: [INVENTORY_REACT_QUERY_KEY],
-          exact: true,
-        }),
-        queryClient.invalidateQueries({
-          queryKey: [INVENTORY_REACT_QUERY_KEY, itemId],
-        }),
-      ]),
   });
+
+  const fnDisplayAsSingleRowInTable = (ItemToBeDisplay: JSX.Element) => {
+    return (
+      <TableRow>
+        <TableCell colSpan={8} align="center">
+          {ItemToBeDisplay}
+        </TableCell>
+      </TableRow>
+    );
+  };
+
+  if (isLoading) return fnDisplayAsSingleRowInTable(<CircularProgress />);
+  if (isError)
+    return fnDisplayAsSingleRowInTable(<pre>{JSON.stringify(error)}</pre>);
+  if (data?.status == 204)
+    return fnDisplayAsSingleRowInTable(<h3>Item does not exist</h3>);
+  const { name, reference, type, stock, cost } = data?.data;
 
   return (
     <>
       <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-        <TableCell align="left">{itemId}</TableCell>
+        <TableCell align="left">{id}</TableCell>
         <TableCell align="left">
           <Box
             sx={{
@@ -116,29 +65,26 @@ const InventoryItem: FunctionComponent<InventoryItemDetails> = ({
             }}
           >
             {name}
-            <AddToCartButtons itemId={itemId} />
+              <ModifyShoppingCartQuantityButtons
+                itemId={id}
+                itemPrice={cost}
+                name={name}
+              />
           </Box>
         </TableCell>
         <TableCell align="left">{reference ? reference : "-"}</TableCell>
         <TableCell align="left">{type}</TableCell>
         <TableCell align="left">{stock}</TableCell>
-        <TableCell align="left">{cost}</TableCell>
+        <TableCell align="left">{formatCurrency(cost)}</TableCell>
         <TableCell align="left">
           <Button
             component={Link}
-            to={`${INVENTORY_LINK.link}/${itemId}/edit`}
+            to={`${INVENTORY_LINK.link}/${id}/edit`}
             startIcon={<EditIcon />}
           >
             Edit
           </Button>
-          <LoadingButton
-            onClick={() => deleteMutation.mutate()}
-            endIcon={<DeleteIcon />}
-            loading={deleteMutation.isLoading}
-            loadingPosition="end"
-          >
-            Delete
-          </LoadingButton>
+          <DeleteInventoryItem id={id} name={name} />
         </TableCell>
       </TableRow>
     </>

@@ -1,19 +1,24 @@
-import { createContext, useState, ReactNode, useMemo } from "react";
-import ShoppingCartDrawer from "src/components/ShoppingCartDrawer";
+import { createContext, useState, ReactNode } from "react";
+import ShoppingCartDrawer from "src/components/ShoppingCart/ShoppingCartDrawer";
+import { showToast } from "src/utilities/toast";
 
 export interface ShoppingCartItem {
   id: number;
   quantity: number;
+  individualPrice: number;
 }
 
 interface ShoppingCartState {
   getItemQuantity: (id: number) => number;
   increaseCartQuantity: (id: number) => void;
+  addToCart: (id: number, individualPrice: number) => void;
   decreaseCartQuantity: (id: number) => void;
   removeFromCart: (id: number) => void;
   clearShoppingCart: () => void;
+  setItemPrice: (id: number) => (newPrice : number) => void;
   openCart: () => void;
   closeCart: () => void;
+  getTotal: () => number;
   totalItemsInCart: number;
   shoppingCart: ShoppingCartItem[];
 }
@@ -34,18 +39,17 @@ export const ShoppingCartProvider = ({
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
-  const totalItemsInCart = useMemo(() => {
-    return shoppingCart.reduce((quantity, item) => quantity + item.quantity, 0);
-  }, [shoppingCart]);
+  const totalItemsInCart = shoppingCart.reduce(
+    (quantity, item) => quantity + item.quantity,
+    0
+  );
+
   const clearShoppingCart = () => setShoppingCart([]);
   const getItemQuantity = (id: number) => {
     return shoppingCart.find((item) => item.id === id)?.quantity || 0;
   };
   const increaseCartQuantity = (id: number) => {
     setShoppingCart((prevItems) => {
-      if (!prevItems.find((item) => item.id === id)) {
-        return [...prevItems, { id, quantity: 1 }];
-      }
       return prevItems.map((item) => {
         if (item.id === id) {
           return { ...item, quantity: item.quantity + 1 };
@@ -54,14 +58,23 @@ export const ShoppingCartProvider = ({
       });
     });
   };
+  const addToCart = (id: number, price: number) => {
+    setShoppingCart((prevItems) => {
+      if (!prevItems.find((item) => item.id === id)) {
+        return [...prevItems, { id, quantity: 1, individualPrice: price }];
+      }
+      showToast(`There is already an item in cart with id=${id}`);
+      return prevItems;
+    });
+  };
   const decreaseCartQuantity = (id: number) => {
     setShoppingCart((prevItems) => {
-      if (prevItems.find((item) => item.id === id)?.quantity === 1) {
-        return prevItems.filter((item) => item.id !== id);
-      }
       return prevItems.map((item) => {
         if (item.id === id) {
-          return { ...item, quantity: item.quantity - 1 };
+          return {
+            ...item,
+            quantity: item.quantity - 1,
+          };
         }
         return item;
       });
@@ -72,19 +85,37 @@ export const ShoppingCartProvider = ({
       return prevItems.filter((item) => item.id !== id);
     });
   };
-
+  const getTotal = () => {
+    return shoppingCart.reduce((total, item) => {
+      return total + item.individualPrice * item.quantity;
+    }, 0);
+  };
+  const setItemPrice = (id: number) => {
+    return (newPrice: number) =>
+      setShoppingCart((prevItems) =>
+        prevItems.map((item) => {
+          if (item.id === id) {
+            return { ...item, individualPrice: newPrice };
+          }
+          return item;
+        })
+      );
+  };
   return (
     <ShoppingCartContext.Provider
       value={{
         openCart,
         closeCart,
         totalItemsInCart,
-        shoppingCart,
+        setItemPrice,
+        addToCart,
+        getTotal,
         clearShoppingCart,
         getItemQuantity,
         increaseCartQuantity,
         decreaseCartQuantity,
         removeFromCart,
+        shoppingCart,
       }}
     >
       {children}

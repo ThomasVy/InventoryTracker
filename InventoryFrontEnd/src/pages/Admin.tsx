@@ -4,7 +4,7 @@ import { FunctionComponent } from "react";
 interface AdminProps {
     
 }
- 
+
 const Admin : FunctionComponent<AdminProps>  = ({}) => {
     const { auth } = useAuth();
     return (  

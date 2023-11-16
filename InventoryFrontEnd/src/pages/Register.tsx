@@ -15,6 +15,7 @@ import HiddenInput from "src/components/HiddenInput";
 import AlertMsg from "src/components/Alert";
 import useVerification, { ServerMessageType } from "src/hooks/useVerification";
 import LoadingComponent from "src/components/LoadingComponent";
+import { showToast } from "src/utilities/toast";
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 const REGISTER_URL = "/register";
@@ -35,7 +36,6 @@ const Register: FunctionComponent<RegisterProps> = () => {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
-  const {setMessage, successMsg, failedMsg} = useVerification();
   const [inputError, setInputError] = useState<Error>({
     password : false,
     confirmPassword: false,
@@ -87,7 +87,7 @@ const Register: FunctionComponent<RegisterProps> = () => {
     const confirmPassword = confirmPasswordRef.current?.value;
 
     if (!isFormValid(username, password, confirmPassword)) {
-      setMessage("Invalid Entry - One of the entries below do not meet the requirements", ServerMessageType.Fail);
+      showToast("Invalid Entry - One of the entries below do not meet the requirements", "error", {autoClose: 10000});
       setLoading(false);
       return;
     }
@@ -97,18 +97,18 @@ const Register: FunctionComponent<RegisterProps> = () => {
         REGISTER_URL,
         JSON.stringify({ username, password })
       );
-      setMessage("Successfully created user", ServerMessageType.Success);
+      showToast("Successfully created user", "success");
       usernameRef.current.value = "";
       passwordRef.current.value = "";
       confirmPasswordRef.current.value = "";
     } catch (error) {
       const err = error as AxiosError;
       if (!err?.response) {
-        setMessage("No Server Response", ServerMessageType.Fail);
+        showToast("No Server Response", "error", {autoClose: 10000});
       } else if (err.response?.status === 409) {
-        setMessage("Username Taken", ServerMessageType.Fail);
+        showToast("Username Taken", "error", {autoClose: 10000});
       } else {
-        setMessage(`Registration Failed - ${err.response?.data.message}`, ServerMessageType.Fail);
+        showToast(`Registration Failed - ${err.response?.data.message}`, "error", {autoClose: 10000});
       }
     }
     setLoading(false);
@@ -120,16 +120,6 @@ const Register: FunctionComponent<RegisterProps> = () => {
       flexDirection: "column",
       alignItems:"center"
     }}>
-        <AlertMsg
-          title="Registration Failed"
-          message={failedMsg}
-          severity="error"
-        />
-        <AlertMsg
-          title="Registration Success"
-          message={successMsg}
-          severity="success"
-        />
         <Typography component="h1" sx={{ m: 2 }} variant="h5">
           Register
         </Typography>

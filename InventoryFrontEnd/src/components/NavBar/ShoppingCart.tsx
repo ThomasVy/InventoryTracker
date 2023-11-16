@@ -2,15 +2,14 @@ import { Tooltip, IconButton, Badge } from "@mui/material";
 import { FunctionComponent } from "react";
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import useShoppingCart from "src/hooks/useShoppingCart";
-import { Link } from "react-router-dom";
-import { PURCHASE_LINK } from "src/data/LinkConstants";
+import useAuth from "src/hooks/useAuth";
 
 interface ShoppingCartProps {}
 
 const ShoppingCart: FunctionComponent<ShoppingCartProps> = () => {
   const { totalItemsInCart, openCart } = useShoppingCart();
-
-  if (totalItemsInCart === 0) {
+  const { auth } = useAuth();
+  if (!auth) {
     return null;
   }
   return (

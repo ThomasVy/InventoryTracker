@@ -1,13 +1,10 @@
 import Login from "./pages/Login.tsx";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import Home from "./pages/Home.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import useAuth from "./hooks/useAuth.tsx";
 import RequireAuth from "./components/RequireAuth.tsx";
 import Admin from "./pages/Admin.tsx";
-import { useEffect, useState } from "react";
-import useRefreshToken from "./hooks/useRefreshToken";
-import { useLocation, useNavigate } from "react-router-dom";
 import Register from "./pages/Register.tsx";
 import NavBar from "./components/NavBar/NavBar.tsx";
 import Inventory from "./pages/Inventory.tsx";
@@ -21,6 +18,8 @@ import {
   REGISTER_LINK,
 } from "./data/LinkConstants.tsx";
 import PurchasePage from "./pages/PurchasePage.tsx";
+import useRefreshToken from "./hooks/useRefreshToken.tsx";
+import { useEffect, useState } from "react";
 
 //https://react.dev/learn/you-might-not-need-an-effect#initializing-the-application
 let didInit = false;

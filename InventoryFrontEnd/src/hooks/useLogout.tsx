@@ -3,39 +3,38 @@ import { useNavigate } from "react-router-dom";
 import axiosPrivate from "../api/authRequest";
 import useAuth from "./useAuth";
 import useShoppingCart from "./useShoppingCart";
+import { showToast } from "src/utilities/toast";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
 
 const LOGOUT_URL = "/logout";
 
 function useLogout() {
-  const [errMsg, setErrMsg] = useState<string>("");
   const { setAuth } = useAuth();
+  const queryClient = useQueryClient();
   const {clearShoppingCart} = useShoppingCart();
 
   const sendLogoutRequest = async () => {
     try {
       const response = await axiosPrivate.get(LOGOUT_URL);
       if (response.status != 200 && response.status != 204) {
-        setErrMsg(`Failed to log out ${response.status}`);
+        showToast(`Failed to log out ${response.status}`);
         return;
       }
 
       if (response.status == 204) {
-        setErrMsg(`No refresh token was supplied`);
+        showToast(`No refresh token was supplied`);
         return;
       }
       clearShoppingCart();
+      queryClient.removeQueries();
       setAuth(null);
     } catch (error) {
-      setErrMsg("Could not reach server");
+      showToast("Could not reach server");
       return;
     }
   };
 
-  const clearErrMsg = () => {
-    setErrMsg("");
-  };
-
-  return { sendLogoutRequest, errMsg, clearErrMsg };
+  return { sendLogoutRequest };
 }
 
 export default useLogout;

@@ -25,6 +25,10 @@ const inventorySchema = new Schema({
       reference: {
         type: String,
       },
+      imageLink : {
+        type : String,
+        default: "http://localhost:4000/images/no-image-icon.png"
+      }
     },
   ],
   purchases: [
