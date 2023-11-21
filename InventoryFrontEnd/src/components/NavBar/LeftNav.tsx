@@ -7,7 +7,7 @@ import {
   Button,
 } from "@mui/material";
 import { useState } from "react";
-import { ADMIN_LINK, HOME_LINK, INVENTORY_LINK, Link } from "src/data/LinkConstants";
+import { ADMIN_LINK, HOME_LINK, INVENTORY_LINK, Link, PURCHASE_HISTORY_LINK, PURCHASE_LINK } from "src/data/LinkConstants";
 import useAuth from "src/hooks/useAuth";
 import { Link as RouterLink } from "react-router-dom";
 import MenuIcon from '@mui/icons-material/Menu';
@@ -18,6 +18,7 @@ const signedInPages: Link[] = [
   ...commonLinks,
   ADMIN_LINK,
   INVENTORY_LINK,
+  PURCHASE_HISTORY_LINK
 ];
 
 const signedOutPages: Link[] = [...commonLinks];

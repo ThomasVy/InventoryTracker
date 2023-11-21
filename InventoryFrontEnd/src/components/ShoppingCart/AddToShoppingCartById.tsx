@@ -1,12 +1,7 @@
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, FormControl, TextField } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
-import { FunctionComponent, useEffect, useState } from "react";
-import {
-  INVENTORY_LIST_API,
-  INVENTORY_REACT_QUERY_KEY,
-} from "src/data/InventoryConstants";
-import useInventoryRequest from "src/hooks/useInventoryRequest";
+import { Box, TextField } from "@mui/material";
+import { FunctionComponent, useState } from "react";
+import { useGetInventoryItem } from "src/hooks/useInventoryRequests";
 import useShoppingCart from "src/hooks/useShoppingCart";
 import { showToast } from "src/utilities/toast";
 
@@ -17,33 +12,25 @@ const AddToShoppingCartById: FunctionComponent<
 > = () => {
   const [itemId, setItemId] = useState<string>("");
   const [isError, setIsError] = useState<boolean>(false);
-  const inventoryRequest = useInventoryRequest();
   const {addToCart} = useShoppingCart();
-  const { isLoading, refetch } = useQuery({
-    queryKey: [INVENTORY_REACT_QUERY_KEY, `${itemId}`],
-    queryFn: async () => {
-      const res = await inventoryRequest.get(`${INVENTORY_LIST_API}/${itemId}`);
-      if (res.status == 204) {
-        showToast(`Item ID ${itemId} is not a valid item`);
-        setIsError(true);
-      } else if (!res.data) {
-        showToast("There was no data from the server response");
-        setIsError(true);
-      } else {
-        setItemId("")
-        addToCart(res.data.itemId, res.data.cost)
-      }
-      return res;
-    },
-    enabled: false,
-    refetchOnWindowFocus: false,
-  });
+  const onSuccessFunc = (statusCode: number, res: any | undefined) => {
+    if (statusCode == 204) {
+      showToast(`Item ID ${itemId} is not a valid item`);
+      setIsError(true);
+    } else if (!res) {
+      showToast("There was no data from the server response");
+      setIsError(true);
+    } else {
+      setItemId("")
+      addToCart(res.itemId, res.cost)
+    }
+  }
+  const {isLoading, refetch} = useGetInventoryItem(parseInt(itemId), false, onSuccessFunc);
 
   const submit = (e) => {
     e.preventDefault();
     if (itemId != "")
       refetch();
-
   };
   return (
     <>

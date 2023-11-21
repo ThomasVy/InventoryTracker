@@ -1,11 +1,4 @@
 import { FunctionComponent } from "react";
-
-import { useQuery } from "@tanstack/react-query";
-import {
-  INVENTORY_LIST_API,
-  INVENTORY_REACT_QUERY_KEY,
-} from "../../data/InventoryConstants";
-
 import {
   Box,
   Button,
@@ -16,7 +9,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
 import { INVENTORY_LINK } from "src/data/LinkConstants";
-import useInventoryRequest from "src/hooks/useInventoryRequest";
+import { useGetInventoryItem } from "src/hooks/useInventoryRequests";
 import ModifyShoppingCartQuantityButtons from "../ShoppingCart/ModifyShoppingCartQuantityButtons";
 import { formatCurrency } from "src/utilities/formatCurrency";
 import DeleteInventoryItem from "./DeleteInventoryItem";
@@ -26,14 +19,6 @@ interface InventoryItemProps {
 }
 
 const InventoryItem: FunctionComponent<InventoryItemProps> = ({ id }) => {
-  const inventoryRequest = useInventoryRequest();
-  const { isLoading, isError, error, data } = useQuery({
-    queryKey: [INVENTORY_REACT_QUERY_KEY, `${id}`],
-    queryFn: () => {
-      return inventoryRequest.get(`${INVENTORY_LIST_API}/${id}`);
-    },
-  });
-
   const fnDisplayAsSingleRowInTable = (ItemToBeDisplay: JSX.Element) => {
     return (
       <TableRow>
@@ -43,13 +28,22 @@ const InventoryItem: FunctionComponent<InventoryItemProps> = ({ id }) => {
       </TableRow>
     );
   };
-
+  const {
+    isLoading,
+    isError,
+    error,
+    statusCode,
+    name,
+    reference,
+    type,
+    stock,
+    cost,
+    owner,
+  } = useGetInventoryItem(id);
   if (isLoading) return fnDisplayAsSingleRowInTable(<CircularProgress />);
-  if (isError)
-    return fnDisplayAsSingleRowInTable(<pre>{JSON.stringify(error)}</pre>);
-  if (data?.status == 204)
+  if (isError) return fnDisplayAsSingleRowInTable(<pre>{error}</pre>);
+  if (statusCode == 204)
     return fnDisplayAsSingleRowInTable(<h3>Item does not exist</h3>);
-  const { name, reference, type, stock, cost } = data?.data;
 
   return (
     <>
@@ -65,13 +59,14 @@ const InventoryItem: FunctionComponent<InventoryItemProps> = ({ id }) => {
             }}
           >
             {name}
-              <ModifyShoppingCartQuantityButtons
-                itemId={id}
-                itemPrice={cost}
-                name={name}
-              />
+            <ModifyShoppingCartQuantityButtons
+              itemId={id}
+              itemPrice={cost}
+              name={name}
+            />
           </Box>
         </TableCell>
+        <TableCell align="left">{owner}</TableCell>
         <TableCell align="left">{reference ? reference : "-"}</TableCell>
         <TableCell align="left">{type}</TableCell>
         <TableCell align="left">{stock}</TableCell>

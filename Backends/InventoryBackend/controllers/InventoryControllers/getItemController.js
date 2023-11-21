@@ -1,4 +1,4 @@
-const Inventory = require("../../model/Inventory");
+const Inventory = require("../../model/InventoryModel");
 
 const handleGetItem = async (req, res) => {
   const itemId = parseInt(req.params.itemId);

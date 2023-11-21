@@ -7,23 +7,14 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import InventoryItems from "./InventoryItems";
+import InventoryListContent from "./InventoryListContent";
 
 interface InventoryListProps {}
 
-export interface TablePaginationActionsProps {
-  count: number;
-  page: number;
-  rowsPerPage: number;
-  onPageChange: (
-    event: React.MouseEvent<HTMLButtonElement>,
-    newPage: number
-  ) => void;
-}
 const InventoryList: FunctionComponent<InventoryListProps> = () => {
   return (
     <>
-      <TableContainer component={Paper} sx={{ maxWidth: "60vw" }}>
+      <TableContainer component={Paper} sx={{ width: "80vw", maxWidth: "lg" }}>
         <Table aria-label="simple table">
           <colgroup>
               <col style={{width:'5%'}}/>
@@ -31,13 +22,15 @@ const InventoryList: FunctionComponent<InventoryListProps> = () => {
               <col style={{width:'5%'}}/>
               <col style={{width:'10%'}}/>
               <col style={{width:'10%'}}/>
-              <col style={{width:'20%'}}/>
+              <col style={{width:'10%'}}/>
+              <col style={{width:'10%'}}/>
               <col style={{width:'30%'}}/>
           </colgroup>
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>Item Name</TableCell>
+              <TableCell align="left">Owner</TableCell>
               <TableCell align="left">Reference</TableCell>
               <TableCell align="left">Type</TableCell>
               <TableCell align="left">Stock</TableCell>
@@ -45,7 +38,7 @@ const InventoryList: FunctionComponent<InventoryListProps> = () => {
               <TableCell align="left">Modify</TableCell>
             </TableRow>
           </TableHead>
-          <InventoryItems />
+          <InventoryListContent />
         </Table>
       </TableContainer>
     </>

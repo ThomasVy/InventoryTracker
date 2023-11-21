@@ -1,68 +1,53 @@
-import { FunctionComponent, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  INVENTORY_ADD_API,
-  INVENTORY_ALL_REACT_QUERY_KEY,
-  INVENTORY_REACT_QUERY_KEY,
-  InventoryItemDetails,
-} from "../../data/InventoryConstants";
-import {
-  Box,
-  FormControl,
-  InputAdornment,
-  InputLabel,
-  MenuItem,
-  OutlinedInput,
-  TextField,
-} from "@mui/material";
+import { FunctionComponent, useState } from "react";
+import { Box, MenuItem, TextField } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
-import useInventoryRequest from "src/hooks/useInventoryRequest";
-import Alert from "../Alert";
+
 import CurrencyInput from "../CurrencyInput";
 import WholeNumberInput from "../WholeNumberInput";
+import { showToast } from "src/utilities/toast";
+import useAuth from "src/hooks/useAuth";
+import { useAddInventoryItem } from "src/hooks/useInventoryRequests";
 interface AddInventoryProps {}
 
 const AddInventory: FunctionComponent<AddInventoryProps> = () => {
-  const name = useRef<HTMLInputElement>();
-  const [stock, setStock] = useState<string>("");
-  const [cost, setCost] = useState<string>("");
-  const reference = useRef<HTMLInputElement>();
-  const type = useRef<HTMLInputElement>();
-
-  const inventoryRequest = useInventoryRequest();
-  const queryClient = useQueryClient();
-
-  const newItemMutation = useMutation({
-    mutationFn: (item: InventoryItemDetails) => {
-      return inventoryRequest.post(INVENTORY_ADD_API, JSON.stringify(item));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: [INVENTORY_ALL_REACT_QUERY_KEY]})
-
-      setStock("");
-      setCost("");
-      name.current.value = "";
-      reference.current.value = "";
-      type.current.value = "Poster";
-    },
-  });
+  const {auth} = useAuth();
+  const [productName, setProductName] = useState("");
+  const [stock, setStock] = useState("");
+  const [cost, setCost] = useState("");
+  const [reference, setReference] = useState("");
+  const [productType, setProductType] = useState("Poster");
+  const [owner, setOwner] = useState(auth ? auth.username : "");
+  const onSuccessFunc = () => {
+    setStock("");
+    setCost("");
+    setProductName("");
+    setReference("");
+    setOwner(auth ? auth.username : "");
+    setProductType("Poster");
+  }
+  const onFailureFunc = (error: string) => {
+    showToast(`Failed to Add ${error}`, "error");
+  }
+  const {mutate, isPending} = useAddInventoryItem(onSuccessFunc, onFailureFunc);
   const handleAddInventory = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    if (!name.current) return;
+    if (!productName) return;
     if (!stock) return;
     if (!cost) return;
-    if (!reference.current) return;
-    if (!type.current) return;
-    newItemMutation.mutate({
+    if (!reference) return;
+    if (!productType) return;
+    if (!owner) return;
+    mutate({
       itemId: -1,
-      name: name.current?.value,
+      name: productName,
       stock: parseInt(stock),
       cost: parseInt(cost),
-      reference: reference.current.value,
-      type: type.current.value,
+      reference: reference,
+      type: productType,
+      owner: owner,
     });
   };
 
@@ -72,40 +57,64 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
       sx={{
         "& > :not(style)": { m: 1, width: "25ch" },
       }}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexWrap: "wrap",
+      }}
       noValidate
       autoComplete="off"
     >
-      {newItemMutation.isError && <Alert title="Add Error" message={JSON.stringify(newItemMutation.error)} severity="error"/>}
-      <TextField required inputRef={name} label="Name" />
-      <WholeNumberInput textFieldProps={{
-            label: "Stock",
-            required: true,
-          }}
-          setInput={setStock}
-          input={stock} />
-      <CurrencyInput textFieldProps={{
-            label: "Cost",
-            required: true,
-          }}
-          setInput={setCost}
-          input={cost} />
+      <TextField
+        required
+        value={productName}
+        onChange={(e) => setProductName(e.target.value)}
+        label="Product Name"
+      />
+      <WholeNumberInput
+        textFieldProps={{
+          label: "Stock",
+          required: true,
+        }}
+        setInput={setStock}
+        input={stock}
+      />
+      <CurrencyInput
+        textFieldProps={{
+          label: "Cost",
+          required: true,
+        }}
+        setInput={setCost}
+        input={cost}
+      />
       <TextField
         select
         required
-        label="Type"
-        defaultValue="Poster"
-        inputRef={type}
+        label="Product Type"
+        value={productType}
+        onChange={(e) => setProductType(e.target.value)}
       >
         <MenuItem value="Poster">Poster</MenuItem>
         <MenuItem value="Keychain">Keychain</MenuItem>
         <MenuItem value="Other">Other</MenuItem>
       </TextField>
 
-      <TextField inputRef={reference} label="Reference" />
+      <TextField
+        value={reference}
+        onChange={(e) => setReference(e.target.value)}
+        label="Reference"
+      />
+
+      <TextField
+        value={owner}
+        onChange={(e) => setOwner(e.target.value)}
+        label="Owner"
+      />
       <LoadingButton
         onClick={(e) => handleAddInventory(e)}
         endIcon={<SendIcon />}
-        loading={newItemMutation.isLoading}
+        loading={isPending}
         loadingPosition="end"
         sx={{
           height: 50,

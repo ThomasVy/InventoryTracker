@@ -6,7 +6,16 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
-import { TablePaginationActionsProps } from "./Inventory/InventoryList";
+
+interface PaginationAction {
+  count?: number;
+  page: number;
+  rowsPerPage?: number;
+  onPageChange?: (
+    event: React.MouseEvent<HTMLButtonElement>,
+    newPage: number
+  ) => void;
+}
 
 interface CreateCustomPaginationActionsProps {
   previousPage: number | undefined;
@@ -17,18 +26,18 @@ interface CreateCustomPaginationActionsProps {
 export const CreateCustomPaginationActions = ({
   previousPage, nextPage, maxPage, setPage,
 }: CreateCustomPaginationActionsProps) => {
-  return ({ page }: TablePaginationActionsProps) => {
+  return ({ page }: PaginationAction) => {
     return (
       <Box sx={{ flexShrink: 0, ml: 2.5 }}>
         <IconButton
           disabled={page === 0}
-          onClick={() => setPage(1)}
+          onClick={() => setPage(0)}
           size="large"
         >
           <FirstPageIcon />
         </IconButton>
         <IconButton
-          disabled={!previousPage}
+          disabled={previousPage == null}
           size="large"
           onClick={() => setPage(previousPage)}
         >

@@ -2,15 +2,9 @@ import { LoadingButton } from "@mui/lab";
 import ConfirmationDialog from "../ConfirmationDialog";
 import { FunctionComponent, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useShoppingCart from "src/hooks/useShoppingCart";
 import { showToast } from "src/utilities/toast";
-import useInventoryRequest from "src/hooks/useInventoryRequest";
-import {
-  INVENTORY_ALL_REACT_QUERY_KEY,
-  INVENTORY_LIST_API,
-  INVENTORY_REACT_QUERY_KEY,
-} from "src/data/InventoryConstants";
+import { useDeleteInventoryItem } from "src/hooks/useInventoryRequests";
 
 interface DeleteInventoryItemProps {
   id: number;
@@ -19,24 +13,8 @@ interface DeleteInventoryItemProps {
 
 const DeleteInventoryItem: FunctionComponent<DeleteInventoryItemProps> = ({ id, name }) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
-  const inventoryRequest = useInventoryRequest();
-  const queryClient = useQueryClient();
   const { getItemQuantity } = useShoppingCart();
-
-  const deleteMutation = useMutation({
-    mutationFn: () => {
-      return inventoryRequest.delete(`${INVENTORY_LIST_API}/${id}`);
-    },
-    onSuccess: () =>
-      Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: [INVENTORY_ALL_REACT_QUERY_KEY],
-        }),
-        queryClient.removeQueries({
-          queryKey: [INVENTORY_REACT_QUERY_KEY, `${id}`],
-        }),
-      ]),
-  });
+  const {mutate, isLoading, isError, error} = useDeleteInventoryItem(id);
   const deleteItem = () => {
     const itemIsCurrentlyInCart = getItemQuantity(id) !== 0;
     if (itemIsCurrentlyInCart) {
@@ -45,14 +23,17 @@ const DeleteInventoryItem: FunctionComponent<DeleteInventoryItemProps> = ({ id, 
       );
       return;
     }
-    deleteMutation.mutate();
+    mutate();
   };
+  if (isError){
+    showToast(error, "error");
+  }
   return (
     <>
       <LoadingButton
         onClick={() => setDeleteModalOpen(true)}
         endIcon={<DeleteIcon />}
-        loading={deleteMutation.isPending}
+        loading={isLoading}
         loadingPosition="end"
       >
         Delete

@@ -14,6 +14,10 @@ const useRefreshToken = () => {
         console.log("Refresh was called");
         try {
             const response = await authRequest.get(REFRESH_URI);
+            if (response.status == 403) {
+                setAuth(null);
+                return null;
+            }
             if (response.status == 201){
                 queryClient.removeQueries();
                 clearShoppingCart();

@@ -18,7 +18,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(verifyJWT);
 
-app.use("/inventory", require('./routes/inventory'));
+app.use("/inventory", require('./routes/inventoryRoutes'));
+app.use("/purchase", require('./routes/purchaseRoutes'));
 
 mongoose.connection.once('open', () => {
     console.log("Connected to MongoDB");

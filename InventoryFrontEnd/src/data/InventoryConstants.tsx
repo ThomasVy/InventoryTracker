@@ -12,5 +12,6 @@ export interface InventoryItemDetails {
     stock: number;
     cost: number;
     type: string;
+    owner: string;
     reference?: string;
 };

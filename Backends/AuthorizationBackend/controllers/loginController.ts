@@ -1,14 +1,16 @@
-const User = require('../model/User');
-const { generateDefaultTokens } = require('./generateToken');
-const { clearRefreshCookie } = require('./cookiesHelpers');
-const { fillAuthResponse } = require('./responseHelpers');
-const bcrypt = require('bcrypt');
+import User from "../model/User";
+import { generateDefaultTokens } from '../utils/generateToken';
+import { clearRefreshCookie, getRefreshToken } from '../utils/cookiesHelpers';
+import { fillAuthResponse } from '../utils/responseHelpers';
+import bcrypt from 'bcrypt';
+import { Response, Request } from "express";
+import Login from "../data/Login";
 
-const handleLogin = async (req, res) => {
-    const cookies = req.cookies;
 
+const handleLogin = async (req : Request<{}, {}, Login>, res: Response) => {
     const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ 'message': 'Username and password are required.' });
+
+    if (!username || !password) return res.status(401).json({ 'message': 'Username and password are required.' });
 
     const foundUser = await User.findOne({ username }).exec();
     if (!foundUser) 
@@ -23,22 +25,21 @@ const handleLogin = async (req, res) => {
     // create JWTs
     const { newAccessToken, newRefreshToken } = generateDefaultTokens(foundUser.id);
 
-    // Changed to let keyword
+    const sentRefreshToken = getRefreshToken(req);
+    
     let newRefreshTokenArray =
-        !cookies?.jwt
+        !sentRefreshToken
             ? foundUser.refreshToken
-            : foundUser.refreshToken.filter(rt => rt !== cookies.jwt);
+            : foundUser.refreshToken.filter(rt => rt !== sentRefreshToken);
 
-    if (cookies?.refreshJWT) {
-
+    if (sentRefreshToken) {
         /* 
         Scenario added here: 
             1) User logs in but never uses RT and does not logout 
             2) RT is stolen
             3) If 1 & 2, reuse detection is needed to clear all RTs when user logs in
         */
-        const refreshToken = cookies.jwt;
-        const foundToken = await User.findOne({ refreshToken }).exec();
+        const foundToken = await User.findOne({ refreshToken: sentRefreshToken }).exec();
 
         // Detected refresh token reuse!
         if (!foundToken) {
@@ -51,9 +52,9 @@ const handleLogin = async (req, res) => {
 
     // Saving refreshToken with current user
     foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
-    const result = await foundUser.save();
+    await foundUser.save();
 
     fillAuthResponse(res, username, newAccessToken, newRefreshToken);
 }
 
-module.exports = handleLogin;
+export default handleLogin;

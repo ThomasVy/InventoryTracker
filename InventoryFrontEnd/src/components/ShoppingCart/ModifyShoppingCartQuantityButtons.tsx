@@ -55,17 +55,17 @@ const ModifyShoppingCartQuantityButtons: FunctionComponent<
           justifyItems: "flex-start"
         }}
       >
+        <IconButton
+          onClick={() => setOpenRemoveItemFromShoppingCartModal(true)}
+        >
+          <RemoveShoppingCartIcon sx={{ color: "red" }} />
+        </IconButton>
         <IconButton onClick={() => decreaseQuantity()}>
           <RemoveIcon />
         </IconButton>
         {itemQuantity}
         <IconButton onClick={() => increaseCartQuantity(itemId)}>
           <AddIcon />
-        </IconButton>
-        <IconButton
-          onClick={() => setOpenRemoveItemFromShoppingCartModal(true)}
-        >
-          <RemoveShoppingCartIcon sx={{ color: "red" }} />
         </IconButton>
         <ConfirmationDialog
           title={`Remove ${name} from shopping cart?`}

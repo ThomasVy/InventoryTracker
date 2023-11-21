@@ -14,7 +14,8 @@ const SearchBar: FunctionComponent<SearchBarProps> = () => {
           </InputAdornment>
         }
         placeholder="Search..."
-        sx={{ input: { color: 'white' } }}
+        sx={{ input: { color: 'white' }}}
+        style={{marginBottom: 20}}
       />
     </>
   );

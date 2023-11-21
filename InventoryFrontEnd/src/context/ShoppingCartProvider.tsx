@@ -1,6 +1,7 @@
 import { createContext, useState, ReactNode } from "react";
 import ShoppingCartDrawer from "src/components/ShoppingCart/ShoppingCartDrawer";
 import { showToast } from "src/utilities/toast";
+import { PurchaseItemDetails, PurchaseOrder } from "src/data/PurchaseConstants";
 
 export interface ShoppingCartItem {
   id: number;
@@ -19,6 +20,7 @@ interface ShoppingCartState {
   openCart: () => void;
   closeCart: () => void;
   getTotal: () => number;
+  collectPurchaseOrder: () => PurchaseOrder; 
   totalItemsInCart: number;
   shoppingCart: ShoppingCartItem[];
 }
@@ -101,6 +103,14 @@ export const ShoppingCartProvider = ({
         })
       );
   };
+  const collectPurchaseOrder: () => PurchaseOrder = ()  =>  {
+    const purchaseList : PurchaseItemDetails[] = shoppingCart.map((cartItem) => {
+      return { itemId: cartItem.id, quantity: cartItem.quantity, individualCost: cartItem.individualPrice};
+    });
+    return {
+      purchaseList
+    };
+  }
   return (
     <ShoppingCartContext.Provider
       value={{
@@ -116,6 +126,7 @@ export const ShoppingCartProvider = ({
         decreaseCartQuantity,
         removeFromCart,
         shoppingCart,
+        collectPurchaseOrder
       }}
     >
       {children}

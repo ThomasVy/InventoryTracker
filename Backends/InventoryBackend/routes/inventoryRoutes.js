@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const Inventory = require('../model/Inventory');
+const Inventory = require('../model/InventoryModel');
 const {paginationResultsForUser} = require('../middleware/pagination');
 const getUserObjectFromModel = require("../middleware/getUserObjectFromModel");
 

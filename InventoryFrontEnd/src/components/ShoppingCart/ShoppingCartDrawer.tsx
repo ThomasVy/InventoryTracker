@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Collapse,
-  Divider,
   Drawer,
   IconButton,
   Stack,
@@ -16,11 +15,11 @@ import ShoppingCartItem from "./ShoppingCartItem";
 import CloseIcon from "@mui/icons-material/Close";
 import { formatCurrency } from "src/utilities/formatCurrency";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
-import CheckIcon from "@mui/icons-material/Check";
+
 import ConfirmationDialog from "../ConfirmationDialog";
 import AddToShoppingCartById from "./AddToShoppingCartById";
-import { LoadingButton } from "@mui/lab";
 import { TransitionGroup } from "react-transition-group";
+import SubmitPurchaseOrderButton from "./SubmitPurchaseOrderButton";
 
 interface ShoppingCartDrawerProps {
   isOpen: boolean;
@@ -30,7 +29,7 @@ const ShoppingCartDrawer: FunctionComponent<ShoppingCartDrawerProps> = ({
   isOpen,
 }) => {
   const [openClearModal, setOpenClearModal] = useState<boolean>(false);
-  const { closeCart, shoppingCart, getTotal, clearShoppingCart, setItemPrice } =
+  const { closeCart, shoppingCart, getTotal, clearShoppingCart, setItemPrice, collectPurchaseOrder } =
     useShoppingCart();
   const theme = useTheme();
   const largeScreen = useMediaQuery(theme.breakpoints.up("md"))
@@ -85,7 +84,6 @@ const ShoppingCartDrawer: FunctionComponent<ShoppingCartDrawerProps> = ({
                 }
             </TransitionGroup>
           </Stack>
-          <Divider />
           <Stack direction="row" justifyContent="flex-end" flexGrow={1}>
             <Typography fontWeight="bold" variant="h4">
               {formatCurrency(getTotal())}
@@ -109,14 +107,7 @@ const ShoppingCartDrawer: FunctionComponent<ShoppingCartDrawerProps> = ({
             >
               Are you sure you want to clear the shopping cart?
             </ConfirmationDialog>
-            <LoadingButton
-              type="submit"
-              loading={false}
-              variant="contained"
-              endIcon={<CheckIcon />}
-            >
-              Submit
-            </LoadingButton>
+            <SubmitPurchaseOrderButton clearShoppingCart={clearShoppingCart} shoppingCart={shoppingCart} collectPurchaseOrder={collectPurchaseOrder}/>
           </Stack>
         </Box>
       </Drawer>

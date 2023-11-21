@@ -1,16 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
 import CircularProgress from "@mui/material/CircularProgress";
-import inventoryRequest from "src/api/inventoryRequest";
-import {
-  INVENTORY_LIST_API,
-  INVENTORY_REACT_QUERY_KEY,
-} from "src/data/InventoryConstants";
 import { FunctionComponent } from "react";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import ModifyShoppingCartQuantityButtons from "./ModifyShoppingCartQuantityButtons";
 import { formatCurrency } from "src/utilities/formatCurrency";
 import { ShoppingCartItem as ProviderItem } from "src/context/ShoppingCartProvider";
 import ShoppingCartItemPrice from "./ShoppingCartItemPrice";
+import { useGetInventoryItem } from "src/hooks/useInventoryRequests";
 
 interface ShoppingCartItemProps extends ProviderItem {
   setItemPrice: (id: number) => (newPrice : number) => void;
@@ -22,21 +17,15 @@ const ShoppingCartItem: FunctionComponent<ShoppingCartItemProps> = ({
   individualPrice,
   setItemPrice,
 }) => {
-  const { isLoading, isError, error, data } = useQuery({
-    queryKey: [INVENTORY_REACT_QUERY_KEY, `${id}`],
-    queryFn: () => {
-      return inventoryRequest.get(`${INVENTORY_LIST_API}/${id}`);
-    },
-  });
+  const {name, cost, imageLink, isLoading, isError, error} = useGetInventoryItem(id);
   if (isLoading) return <CircularProgress />;
   if (isError) {
-    console.log(`Item doesn't ${JSON.stringify(error)}`);
+    console.log(`Item doesn't ${error}`);
     return null;
   }
-  const { name, cost, imageLink } = data?.data;
   const setIndividualPrice = setItemPrice(id);
   return (
-    <Stack direction="row" gap={3} alignItems="center">
+    <Stack direction="row" gap={3} sx={{ py: 2, borderBottom: 1, borderColor: 'grey.500'}} alignItems="center">
       <Box
         component="img"
         alt="No Image"

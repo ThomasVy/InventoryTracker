@@ -60,7 +60,7 @@ const EditShoppingCartItemPrice: FunctionComponent<
         setOpen={setOpenConfirmation}
         onConfirm={handleConfirm}
       >
-        Are you sure you want to save {customPrice} as the total?
+        Are you sure you want to save <b>${customPrice}</b> as the total?
       </ConfirmationDialog>
     </>
   );
