@@ -63,7 +63,7 @@ function App() {
         justifyContent="center"
         alignItems="center"
         spacing={1}
-        marginTop={8}
+        marginY={8}
       >
         <Routes>
           <Route

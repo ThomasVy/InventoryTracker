@@ -2,7 +2,6 @@ const moment = require('moment-timezone');
 
 const handleListPurchases = (req, res) => {
   const orders = req.paginationResults.results.map((order) => {
-    console.log(order);
     return {
       id: order._id,
       date: moment(order.date),

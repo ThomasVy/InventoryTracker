@@ -6,7 +6,7 @@ import PurchaseHistoryItem from "./PurchaseHistoryItem";
 
 interface PurchaseHistoryListProps {}
 
-const LIMIT = 5;
+const LIMIT = 3;
 const PurchaseHistoryList: FunctionComponent<PurchaseHistoryListProps> = () => {
     const [page, setPage] = useState<number>(0);
     const {
@@ -33,11 +33,12 @@ const PurchaseHistoryList: FunctionComponent<PurchaseHistoryListProps> = () => {
   })({ page: page});
   const startIndex = page * LIMIT + 1;
   const endIndex = Math.min((page+1) * LIMIT, totalItems);
+
   return (
     <>
-    {results.map((order) => <PurchaseHistoryItem key={order.id} id={order.id} date={order.date} items={order.items}/>)}
     {startIndex}-{endIndex} of {totalItems}
     {CustomPaginationActions}
+    {results.map((order) => <PurchaseHistoryItem key={order.id} id={order.id} date={order.date} items={order.items}/>)}
     </>
   );
 };

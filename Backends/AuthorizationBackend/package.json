@@ -8,7 +8,7 @@
     "predeploy": "npm run build",
     "deply": "node bin/server.js",
     "predev": "npm run build",
-    "dev": "concurrently \"npx tsc -w\" & \"nodemon -L bin/server.js\""
+    "dev": "concurrently \"npx tsc -w\" \"nodemon bin/server.js\""
   },
   "keywords": [],
   "author": "",
