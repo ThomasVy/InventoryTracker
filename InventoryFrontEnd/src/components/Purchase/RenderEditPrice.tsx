@@ -2,17 +2,17 @@ import { Box, Button } from "@mui/material";
 import { FunctionComponent, useState } from "react";
 import CurrencyInput from "../CurrencyInput";
 import ConfirmationDialog from "../ConfirmationDialog";
-import { Mode } from "./ShoppingCartItemPrice";
+import { Mode } from "./RenderItemPrice";
 
-interface EditShoppingCartItemPriceProps {
+interface RenderEditPriceProps {
   totalPrice: number;
   setTotalPrice: (newTotalPrice: number) => void;
   setMode: React.Dispatch<React.SetStateAction<Mode>>;
   editBoxWidth: number;
 }
 
-const EditShoppingCartItemPrice: FunctionComponent<
-  EditShoppingCartItemPriceProps
+const RenderEditPrice: FunctionComponent<
+  RenderEditPriceProps
 > = ({ totalPrice, setTotalPrice, setMode, editBoxWidth }) => {
   const [customPrice, setCustomPrice] = useState<string>(totalPrice.toFixed(2));  
   const [openConfirmation, setOpenConfirmation] = useState<boolean>(false);
@@ -66,4 +66,4 @@ const EditShoppingCartItemPrice: FunctionComponent<
   );
 };
 
-export default EditShoppingCartItemPrice;
+export default RenderEditPrice;

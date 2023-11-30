@@ -4,11 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "build": "rimraf bin && npx tsc",
-    "predeploy": "npm run build",
-    "deply": "node bin/server.js",
-    "predev": "npm run build",
-    "dev": "concurrently \"npx tsc -w\" \"nodemon bin/server.js\""
+    "dev": "nodemon server.ts"
   },
   "keywords": [],
   "author": "",
@@ -20,9 +16,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.6.5",
-    "rimraf": "^5.0.5",
-    "typescript": "^5.3.2"
+    "mongoose": "^7.6.5"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -31,7 +25,8 @@
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.9.3",
-    "concurrently": "^8.2.2",
-    "nodemon": "^2.0.22"
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
   }
 }

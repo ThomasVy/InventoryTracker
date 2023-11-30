@@ -61,6 +61,9 @@ function paginatedResults(model) {
         }
         const {user} = req;
         const allItemsForThatUser = await model.find({user});
+
+        if (allItemsForThatUser.length === 0) return res.status(204).json({message: "Not available"});
+
         if (limit < 0) {
             limit = allItemsForThatUser.length;
         }

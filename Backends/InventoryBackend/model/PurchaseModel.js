@@ -13,8 +13,8 @@ const purchaseSchema = Schema({
     },
     items: [
         {
-            itemId: Number,
-            individualPrice: Number,
+            id: Number,
+            price: Number,
             quantity: Number,
         },
     ],

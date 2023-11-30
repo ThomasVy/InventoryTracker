@@ -1,13 +1,8 @@
 import { createContext, useState, ReactNode } from "react";
 import ShoppingCartDrawer from "src/components/ShoppingCart/ShoppingCartDrawer";
 import { showToast } from "src/utilities/toast";
-import { PurchaseItemDetails, PurchaseOrder } from "src/data/PurchaseConstants";
+import { PurchaseItemDetails } from "src/data/PurchaseConstants";
 
-export interface ShoppingCartItem {
-  id: number;
-  quantity: number;
-  individualPrice: number;
-}
 
 interface ShoppingCartState {
   getItemQuantity: (id: number) => number;
@@ -16,13 +11,11 @@ interface ShoppingCartState {
   decreaseCartQuantity: (id: number) => void;
   removeFromCart: (id: number) => void;
   clearShoppingCart: () => void;
-  setItemPrice: (id: number) => (newPrice : number) => void;
+  setItemPrice: (id: number, newPrice: number) => void;
   openCart: () => void;
   closeCart: () => void;
-  getTotal: () => number;
-  collectPurchaseOrder: () => PurchaseOrder; 
   totalItemsInCart: number;
-  shoppingCart: ShoppingCartItem[];
+  shoppingCart: PurchaseItemDetails[];
 }
 
 const ShoppingCartContext = createContext<ShoppingCartState>(
@@ -37,7 +30,7 @@ export const ShoppingCartProvider = ({
   children,
 }: ShoppingCartProviderProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [shoppingCart, setShoppingCart] = useState<ShoppingCartItem[]>([]);
+  const [shoppingCart, setShoppingCart] = useState<PurchaseItemDetails[]>([]);
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
@@ -54,7 +47,8 @@ export const ShoppingCartProvider = ({
     setShoppingCart((prevItems) => {
       return prevItems.map((item) => {
         if (item.id === id) {
-          return { ...item, quantity: item.quantity + 1 };
+          const eachItemPrice = item.price/item.quantity;
+          return { ...item, quantity: item.quantity + 1, price: item.price+eachItemPrice};
         }
         return item;
       });
@@ -63,7 +57,7 @@ export const ShoppingCartProvider = ({
   const addToCart = (id: number, price: number) => {
     setShoppingCart((prevItems) => {
       if (!prevItems.find((item) => item.id === id)) {
-        return [...prevItems, { id, quantity: 1, individualPrice: price }];
+        return [...prevItems, { id, quantity: 1, price }];
       }
       showToast(`There is already an item in cart with id=${id}`);
       return prevItems;
@@ -73,9 +67,11 @@ export const ShoppingCartProvider = ({
     setShoppingCart((prevItems) => {
       return prevItems.map((item) => {
         if (item.id === id) {
+          const eachItemPrice = item.price/item.quantity;
           return {
             ...item,
             quantity: item.quantity - 1,
+            price: item.price - eachItemPrice
           };
         }
         return item;
@@ -87,30 +83,17 @@ export const ShoppingCartProvider = ({
       return prevItems.filter((item) => item.id !== id);
     });
   };
-  const getTotal = () => {
-    return shoppingCart.reduce((total, item) => {
-      return total + item.individualPrice * item.quantity;
-    }, 0);
-  };
-  const setItemPrice = (id: number) => {
-    return (newPrice: number) =>
+  const setItemPrice = (id: number, newPrice: number) => {
       setShoppingCart((prevItems) =>
         prevItems.map((item) => {
           if (item.id === id) {
-            return { ...item, individualPrice: newPrice };
+            return { ...item, price: newPrice };
           }
           return item;
         })
       );
   };
-  const collectPurchaseOrder: () => PurchaseOrder = ()  =>  {
-    const purchaseList : PurchaseItemDetails[] = shoppingCart.map((cartItem) => {
-      return { itemId: cartItem.id, quantity: cartItem.quantity, individualCost: cartItem.individualPrice};
-    });
-    return {
-      purchaseList
-    };
-  }
+
   return (
     <ShoppingCartContext.Provider
       value={{
@@ -119,14 +102,12 @@ export const ShoppingCartProvider = ({
         totalItemsInCart,
         setItemPrice,
         addToCart,
-        getTotal,
         clearShoppingCart,
         getItemQuantity,
         increaseCartQuantity,
         decreaseCartQuantity,
         removeFromCart,
-        shoppingCart,
-        collectPurchaseOrder
+        shoppingCart
       }}
     >
       {children}

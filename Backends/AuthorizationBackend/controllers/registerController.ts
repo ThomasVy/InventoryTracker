@@ -1,7 +1,7 @@
 import User from "../model/User";
 import bcrypt from "bcrypt";
 import { Response, Request } from "express";
-import Login from "../data/Login";
+import Login from "../data/LoginData";
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;

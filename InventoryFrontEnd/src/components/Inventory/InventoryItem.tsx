@@ -10,9 +10,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
 import { INVENTORY_LINK } from "src/data/LinkConstants";
 import { useGetInventoryItem } from "src/hooks/useInventoryRequests";
-import ModifyShoppingCartQuantityButtons from "../ShoppingCart/ModifyShoppingCartQuantityButtons";
 import { formatCurrency } from "src/utilities/formatCurrency";
 import DeleteInventoryItem from "./DeleteInventoryItem";
+import RenderItemModifyingButtons from "../Purchase/RenderItemModifyingButtons";
+import useShoppingCart from "src/hooks/useShoppingCart";
 
 interface InventoryItemProps {
   id: number;
@@ -28,6 +29,7 @@ const InventoryItem: FunctionComponent<InventoryItemProps> = ({ id }) => {
       </TableRow>
     );
   };
+  const { getItemQuantity, addToCart, removeFromCart, decreaseCartQuantity, increaseCartQuantity } = useShoppingCart();
   const {
     isLoading,
     isError,
@@ -45,6 +47,8 @@ const InventoryItem: FunctionComponent<InventoryItemProps> = ({ id }) => {
   if (statusCode == 204)
     return fnDisplayAsSingleRowInTable(<h3>Item does not exist</h3>);
 
+  const quantityInShoppingCart = getItemQuantity(id);
+
   return (
     <>
       <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
@@ -59,10 +63,21 @@ const InventoryItem: FunctionComponent<InventoryItemProps> = ({ id }) => {
             }}
           >
             {name}
-            <ModifyShoppingCartQuantityButtons
-              itemId={id}
-              itemPrice={cost}
-              name={name}
+            <RenderItemModifyingButtons
+              decreaseQuantity={() => {
+                decreaseCartQuantity(id);
+              }}
+              increaseQuantity={() => {
+                if (quantityInShoppingCart == 0) {
+                  addToCart(id, cost);
+                } else {
+                  increaseCartQuantity(id);
+                }
+              }}
+              quantity={getItemQuantity(id)}
+              removeAllQuantity={() => {
+                removeFromCart(id);
+              }}
             />
           </Box>
         </TableCell>

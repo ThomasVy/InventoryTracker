@@ -20,7 +20,7 @@ const LOGIN_URL = "/login";
 function Login() {
   const { setAuth } = useAuth();
   const [isLoading, setLoading] = useState<boolean>(false);
-
+  const [error, setError] = useState(false);
   const usernameRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   
@@ -40,8 +40,11 @@ function Login() {
     } catch (err) {
       if (!err?.response) {
         showToast("No Server Response");
+        setError(true);
       } else {
+        console.log(err?.response)
         showToast("Verification Failed");
+        setError(true);
       }
     }
     setLoading(false);
@@ -69,6 +72,7 @@ function Login() {
           fullWidth
           autoComplete="username"
           autoFocus
+          error={error}
         />
 
         <HiddenInput
@@ -76,6 +80,7 @@ function Login() {
           label="Password"
           id="password"
           autocomplete="current-password"
+          error={error}
         />
         <Button
           type="submit"

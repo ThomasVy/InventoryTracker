@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Collapse,
   Drawer,
   IconButton,
   Stack,
@@ -11,15 +10,14 @@ import {
 } from "@mui/material";
 import { FunctionComponent, useState } from "react";
 import useShoppingCart from "src/hooks/useShoppingCart";
-import ShoppingCartItem from "./ShoppingCartItem";
 import CloseIcon from "@mui/icons-material/Close";
-import { formatCurrency } from "src/utilities/formatCurrency";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
 
 import ConfirmationDialog from "../ConfirmationDialog";
-import AddToShoppingCartById from "./AddToShoppingCartById";
-import { TransitionGroup } from "react-transition-group";
+
 import SubmitPurchaseOrderButton from "./SubmitPurchaseOrderButton";
+import RenderListOfItems from "../Purchase/RenderListOfItems";
+import { ModifyingItemFuncs } from "src/data/ItemConstants";
 
 interface ShoppingCartDrawerProps {
   isOpen: boolean;
@@ -29,7 +27,7 @@ const ShoppingCartDrawer: FunctionComponent<ShoppingCartDrawerProps> = ({
   isOpen,
 }) => {
   const [openClearModal, setOpenClearModal] = useState<boolean>(false);
-  const { closeCart, shoppingCart, getTotal, clearShoppingCart, setItemPrice, collectPurchaseOrder } =
+  const { closeCart, shoppingCart, clearShoppingCart, setItemPrice, addToCart, removeFromCart, decreaseCartQuantity, increaseCartQuantity } =
     useShoppingCart();
   const theme = useTheme();
   const largeScreen = useMediaQuery(theme.breakpoints.up("md"))
@@ -38,6 +36,22 @@ const ShoppingCartDrawer: FunctionComponent<ShoppingCartDrawerProps> = ({
   };
   const smallScreenProps = {
     sx: { width: "100vw"}
+  }
+  const modifyingFuncs = (id: number) : ModifyingItemFuncs =>  {
+    return {
+      decreaseQuantity: () => {
+        decreaseCartQuantity(id);
+      },
+      increaseQuantity: () => {
+        increaseCartQuantity(id);
+      },
+      removeAllQuantity: () => {
+        removeFromCart(id)
+      },
+      setPrice: (newPrice: number) => {
+        setItemPrice(id, newPrice);
+      }
+    };
   }
   return (
     <>
@@ -74,21 +88,7 @@ const ShoppingCartDrawer: FunctionComponent<ShoppingCartDrawerProps> = ({
               <CloseIcon />
             </IconButton>
           </Box>
-          <Stack direction="row" justifyContent="center">
-            <AddToShoppingCartById />
-          </Stack>
-          <Stack flexDirection="column">
-            <TransitionGroup>
-              {shoppingCart.map((item) =>
-                <Collapse key={item.id}><ShoppingCartItem {...item} setItemPrice={setItemPrice}/></Collapse>)
-                }
-            </TransitionGroup>
-          </Stack>
-          <Stack direction="row" justifyContent="flex-end" flexGrow={1}>
-            <Typography fontWeight="bold" variant="h4">
-              {formatCurrency(getTotal())}
-            </Typography>
-          </Stack>
+          <RenderListOfItems items={shoppingCart} modifyItemFuncs={modifyingFuncs} addFunc={addToCart}/>
           <Stack direction="row" justifyContent="space-between">
             <Button
               color="error"
@@ -107,7 +107,7 @@ const ShoppingCartDrawer: FunctionComponent<ShoppingCartDrawerProps> = ({
             >
               Are you sure you want to clear the shopping cart?
             </ConfirmationDialog>
-            <SubmitPurchaseOrderButton clearShoppingCart={clearShoppingCart} shoppingCart={shoppingCart} collectPurchaseOrder={collectPurchaseOrder}/>
+            <SubmitPurchaseOrderButton clearShoppingCart={clearShoppingCart} shoppingCart={shoppingCart} />
           </Stack>
         </Box>
       </Drawer>

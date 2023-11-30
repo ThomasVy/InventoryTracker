@@ -3,11 +3,13 @@ export const PURCHASE_API = "/purchase";
 export const PURCHASE_LIST_KEY = "purchase_all";
 
 export interface PurchaseItemDetails {
-    itemId: number;
+    id: number;
     quantity: number;
-    individualCost: number;
+    price: number;
 }
 
 export interface PurchaseOrder {
-    purchaseList: PurchaseItemDetails[]
-};
+    id: number;
+    date: string,
+    items: PurchaseItemDetails[];
+}

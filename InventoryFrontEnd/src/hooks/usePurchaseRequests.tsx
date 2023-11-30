@@ -1,17 +1,17 @@
 import useAuthPrivateRequest from "./usePrivateRequest";
 import backendRequest from "../api/backendRequest";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PURCHASE_API, PURCHASE_LIST_KEY, PurchaseOrder } from "src/data/PurchaseConstants";
+import { UndefinedInitialDataOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { PURCHASE_API, PURCHASE_LIST_KEY, PurchaseItemDetails } from "src/data/PurchaseConstants";
 
 export function useSendPurchaseOrder(onSuccessFunc: (id: number) => void, onErrorFunc: (error: string) => void) {
   const privatePurchaseRequest = useAuthPrivateRequest(backendRequest);
   const queryClient = useQueryClient();
 
   const { isPending, mutate } = useMutation({
-    mutationFn: (purchaseOrder: PurchaseOrder) => {
+    mutationFn: (purchaseOrder: PurchaseItemDetails[]) => {
       return privatePurchaseRequest.post(
         PURCHASE_API,
-        JSON.stringify(purchaseOrder)
+        JSON.stringify({purchaseList: purchaseOrder})
       );
     },
     onSuccess: (data) => {
@@ -69,5 +69,25 @@ export function useGetPurchaseHistory(page: number, limit: number) {
     nextPage,
     maxPage,
     totalItems,
+  };
+}
+export function useGetIndividualPurchaseOrder(id: number, option?: Partial<UndefinedInitialDataOptions>) {
+  const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
+  const { isLoading, isError, error, data, refetch } = useQuery({
+    queryKey: [PURCHASE_LIST_KEY, id],
+    queryFn: () => {
+      return privateInventoryRequest.get<Item>(`${PURCHASE_API}/${id}`); 
+    },
+    ...option
+  });
+  const statusCode = data?.status;
+  const axiosData =  data?.data;
+  return {
+    isLoading,
+    refetch,
+    isError,
+    error: JSON.stringify(error),
+    statusCode,
+    data: axiosData
   };
 }

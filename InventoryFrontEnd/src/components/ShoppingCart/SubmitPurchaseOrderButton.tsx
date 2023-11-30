@@ -1,18 +1,16 @@
 import { LoadingButton } from "@mui/lab";
 import { FunctionComponent } from "react";
 import CheckIcon from "@mui/icons-material/Check";
-import { ShoppingCartItem } from "src/context/ShoppingCartProvider";
 import { showToast } from "src/utilities/toast";
 import { useSendPurchaseOrder } from "src/hooks/usePurchaseRequests";
-import { PurchaseOrder } from "src/data/PurchaseConstants";
+import { PurchaseItemDetails } from "src/data/PurchaseConstants";
 
 interface SubmitPurchaseOrderButtonProps {
-    shoppingCart : ShoppingCartItem[];
+    shoppingCart : PurchaseItemDetails[];
     clearShoppingCart: () => void;
-    collectPurchaseOrder: () => PurchaseOrder;
 }
  
-const SubmitPurchaseOrderButton: FunctionComponent<SubmitPurchaseOrderButtonProps> = ({shoppingCart, clearShoppingCart, collectPurchaseOrder}) => {
+const SubmitPurchaseOrderButton: FunctionComponent<SubmitPurchaseOrderButtonProps> = ({shoppingCart, clearShoppingCart}) => {
     const onSuccessSend = (id: number) => {
         showToast(`Successfully created purchase #${id}`, "success");
         clearShoppingCart();
@@ -26,7 +24,7 @@ const SubmitPurchaseOrderButton: FunctionComponent<SubmitPurchaseOrderButtonProp
           showToast("Please add at least 1 item before submitting", "error");
           return;
         }
-        mutate(collectPurchaseOrder());
+        mutate(shoppingCart);
     }
     return ( 
         <LoadingButton
@@ -34,6 +32,7 @@ const SubmitPurchaseOrderButton: FunctionComponent<SubmitPurchaseOrderButtonProp
         variant="contained"
         endIcon={<CheckIcon />}
         onClick={handleSubmit}
+        disabled={shoppingCart.length === 0}
       >
         Submit
       </LoadingButton>

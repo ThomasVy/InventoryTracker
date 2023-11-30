@@ -1,44 +1,47 @@
 import {
-  Box,
   Card,
   CardActionArea,
   CardContent,
+  CircularProgress,
   Divider,
   Stack,
   Typography,
 } from "@mui/material";
 import { FunctionComponent } from "react";
 import { format } from "date-fns";
-import { useGetInventoryItem } from "src/hooks/useInventoryRequests";
-import DisplayItem from "./DisplayItem";
+import DisplayConstItem from "../Purchase/DisplayConstItem";
 import { formatCurrency } from "src/utilities/formatCurrency";
-
-interface Item {
-  itemId: number;
-  quantity: number;
-  individualPrice: number;
-}
+import { Link as RouterLink } from 'react-router-dom';
+import { PURCHASE_HISTORY_LINK } from "src/data/LinkConstants";
+import { useGetIndividualPurchaseOrder } from "src/hooks/usePurchaseRequests";
 
 interface PurchaseHistoryItemProps {
   id: number;
-  date: string;
-  items: Item[];
 }
 
 const PurchaseHistoryItem: FunctionComponent<PurchaseHistoryItemProps> = ({
-  id,
-  date,
-  items,
-}) => {
+  id }) => {
+  const {
+    data,
+    error,
+    isError,
+    isLoading,
+    statusCode
+  } = useGetIndividualPurchaseOrder(id);
+
+  if (isLoading) return <CircularProgress />;
+  if (isError) return <pre>{error}</pre>;
+  if (statusCode == 403 || !data) return <h3>Item does not exist</h3>;
+  const date = new Date(data.date);
+  const items = data.items;
   const displayFirstItem = () => {
-    const firstItemInOrder = items.at(0);
-    if (!firstItemInOrder) return <b> Error: No Items in Order </b>;
+  const firstItemInOrder = items.at(0);
+  if (!firstItemInOrder) return <b> Error: No Items in Order </b>;
 
     return (
       <>
-        <DisplayItem
-          id={firstItemInOrder.itemId}
-          individualPrice={firstItemInOrder.individualPrice}
+        <DisplayConstItem
+          id={firstItemInOrder.id}
           quantity={firstItemInOrder.quantity}
         />
       </>
@@ -56,8 +59,6 @@ const PurchaseHistoryItem: FunctionComponent<PurchaseHistoryItemProps> = ({
       </>
     );
   };
-
-  const dateObj = new Date(date);
   return (
     <>
       <Card
@@ -67,13 +68,13 @@ const PurchaseHistoryItem: FunctionComponent<PurchaseHistoryItemProps> = ({
           maxWidth: "md",
         }}
       >
-        <CardActionArea onClick={() => alert(id)}>
+        <CardActionArea component={RouterLink} to={`${PURCHASE_HISTORY_LINK.link}/${id}`}>
           <CardContent>
             <Typography sx={{ fontSize: 16 }} gutterBottom>
               Order ID: <b>{id}</b>
             </Typography>
             <Typography fontSize={14} color="text.secondary">
-              Purchased On: <b>{format(dateObj, "PP")}</b>
+              Purchased On: <b>{date ? format(date, "PP") : "No date"}</b>
             </Typography>
             {displayFirstItem()}
             {displayTextForMoreItems()}

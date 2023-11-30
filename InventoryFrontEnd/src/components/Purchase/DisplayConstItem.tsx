@@ -1,15 +1,10 @@
 import { Stack, Box, Typography, CircularProgress } from "@mui/material";
 import { FunctionComponent } from "react";
+import { PurchaseItemDetails } from "src/data/PurchaseConstants";
 import { useGetInventoryItem } from "src/hooks/useInventoryRequests";
-import { formatCurrency } from "src/utilities/formatCurrency";
 
-interface DisplayItemProps {
-  id: number;
-  quantity: number;
-  individualPrice: number;
-}
 
-const DisplayItem: FunctionComponent<DisplayItemProps> = ({
+const DisplayConstItem: FunctionComponent<Omit<PurchaseItemDetails, "price">> = ({
   id,
   quantity,
 }) => {
@@ -40,11 +35,11 @@ const DisplayItem: FunctionComponent<DisplayItemProps> = ({
           alignContent="center"
           alignItems="center"
         >
-          <Typography sx={{ fontSize: 14.5, marginRight: 2 }} color="text.secondary">
-            {quantity}x 
-          </Typography>
           <Typography fontSize={18} color="text.secondary">
             {name}
+          </Typography>
+          <Typography sx={{ fontSize: 14.5, marginLeft: 2 }} color="text.secondary">
+            x{quantity} 
           </Typography>
         </Stack>
       </Stack>
@@ -52,4 +47,4 @@ const DisplayItem: FunctionComponent<DisplayItemProps> = ({
   );
 };
 
-export default DisplayItem;
+export default DisplayConstItem;

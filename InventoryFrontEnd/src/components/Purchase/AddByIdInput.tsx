@@ -2,17 +2,17 @@ import { LoadingButton } from "@mui/lab";
 import { Box, TextField } from "@mui/material";
 import { FunctionComponent, useState } from "react";
 import { useGetInventoryItem } from "src/hooks/useInventoryRequests";
-import useShoppingCart from "src/hooks/useShoppingCart";
 import { showToast } from "src/utilities/toast";
 
-interface AddToShoppingCartByIdProps {}
+interface AddByIdInputProps {
+  addFunc : (id: number, cost: number) => void;
+}
 
-const AddToShoppingCartById: FunctionComponent<
-  AddToShoppingCartByIdProps
-> = () => {
+const AddByIdInput: FunctionComponent<
+  AddByIdInputProps
+> = ({addFunc}) => {
   const [itemId, setItemId] = useState<string>("");
   const [isError, setIsError] = useState<boolean>(false);
-  const {addToCart} = useShoppingCart();
   const onSuccessFunc = (statusCode: number, res: any | undefined) => {
     if (statusCode == 204) {
       showToast(`Item ID ${itemId} is not a valid item`);
@@ -22,7 +22,7 @@ const AddToShoppingCartById: FunctionComponent<
       setIsError(true);
     } else {
       setItemId("")
-      addToCart(res.itemId, res.cost)
+      addFunc(res.itemId, res.cost)
     }
   }
   const {isLoading, refetch} = useGetInventoryItem(parseInt(itemId), false, onSuccessFunc);
@@ -51,10 +51,14 @@ const AddToShoppingCartById: FunctionComponent<
           disabled={isLoading}
           value={itemId}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            const alphaNumericRegex = /^[a-z0-9]+$/i;
             if (event.target.value === ""){
               setIsError(false);
+              setItemId(event.target.value);
             }
-            setItemId(event.target.value.replace(/[^0-9]/g, ""));
+            else if (alphaNumericRegex.test(event.target.value)){
+              setItemId(event.target.value);
+            }
           }}
           label="Add an Item by ID"
         />
@@ -66,4 +70,4 @@ const AddToShoppingCartById: FunctionComponent<
   );
 };
 
-export default AddToShoppingCartById;
+export default AddByIdInput;

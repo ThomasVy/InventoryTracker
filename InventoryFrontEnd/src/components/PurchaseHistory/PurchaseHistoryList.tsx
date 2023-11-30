@@ -24,7 +24,7 @@ const PurchaseHistoryList: FunctionComponent<PurchaseHistoryListProps> = () => {
     
   if (isLoading) return <CircularProgress />;
   if (isError) return <pre>{error}</pre>;
-  if (statusCode == 204 || !results ) return <h3>No purchases available</h3>;
+  if (statusCode == 204 || !results ) return <h3>No Purchases Available</h3>;
   const CustomPaginationActions = CreateCustomPaginationActions({
     previousPage,
     nextPage,
@@ -38,7 +38,7 @@ const PurchaseHistoryList: FunctionComponent<PurchaseHistoryListProps> = () => {
     <>
     {startIndex}-{endIndex} of {totalItems}
     {CustomPaginationActions}
-    {results.map((order) => <PurchaseHistoryItem key={order.id} id={order.id} date={order.date} items={order.items}/>)}
+    {results.map((order) => <PurchaseHistoryItem key={order.id} id={order.id}/>)}
     </>
   );
 };

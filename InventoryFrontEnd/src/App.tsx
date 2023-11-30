@@ -22,6 +22,7 @@ import PurchasePage from "./pages/PurchasePage.tsx";
 import useRefreshToken from "./hooks/useRefreshToken.tsx";
 import { useEffect, useState } from "react";
 import PurchaseHistory from "./pages/PurchaseHistoryPage.tsx";
+import EditPurchaseHistoryPage from "./pages/EditPurchaseHistoryPage.tsx";
 
 //https://react.dev/learn/you-might-not-need-an-effect#initializing-the-application
 let didInit = false;
@@ -80,6 +81,7 @@ function App() {
             <Route path={PURCHASE_LINK.link} element={<PurchasePage />} />
             <Route path={INVENTORY_EDIT_LINK.link} element={<NotFound />} />
             <Route path={PURCHASE_HISTORY_LINK.link} element={<PurchaseHistory />} />
+            <Route path={`${PURCHASE_HISTORY_LINK.link}/:purchaseId`} element={<EditPurchaseHistoryPage />} />
           </Route>
 
           <Route path="/" element={<Home />} />

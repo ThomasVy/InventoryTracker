@@ -1,15 +1,15 @@
 import { Button, Stack, Typography } from "@mui/material";
 import { forwardRef } from "react";
 import { formatCurrency } from "src/utilities/formatCurrency";
-import { Mode } from "./ShoppingCartItemPrice";
+import { Mode } from "./RenderItemPrice";
 
-interface NormalShoppingCartItemPriceProps {
+interface RenderNormalPriceProps {
     totalPrice :number;
     setMode: React.Dispatch<React.SetStateAction<Mode>>
 }
 
 type Ref = HTMLSpanElement;
-const NormalShoppingCartItemPrice = forwardRef<Ref, NormalShoppingCartItemPriceProps>(({totalPrice, setMode}, ref) => {
+const RenderNormalPrice = forwardRef<Ref, RenderNormalPriceProps>(({totalPrice, setMode}, ref) => {
   return (
     <>
       <Stack
@@ -27,4 +27,4 @@ const NormalShoppingCartItemPrice = forwardRef<Ref, NormalShoppingCartItemPriceP
   );
 });
 
-export default NormalShoppingCartItemPrice;
+export default RenderNormalPrice;
