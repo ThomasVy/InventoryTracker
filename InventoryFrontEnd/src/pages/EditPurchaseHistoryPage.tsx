@@ -85,7 +85,6 @@ function EditPurchaseHistoryPage() {
             setPrice: (newPrice: number) => {
                 setPurchaseHistoryState((prevState) => {
                     if (!prevState) return prevState;
-                    console.log(newPrice);
                     return {
                         ...prevState,
                         items: prevState.items.map(

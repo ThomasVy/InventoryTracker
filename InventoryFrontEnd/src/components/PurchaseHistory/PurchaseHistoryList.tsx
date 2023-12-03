@@ -33,7 +33,6 @@ const PurchaseHistoryList: FunctionComponent<PurchaseHistoryListProps> = () => {
   })({ page: page});
   const startIndex = page * LIMIT + 1;
   const endIndex = Math.min((page+1) * LIMIT, totalItems);
-
   return (
     <>
     {startIndex}-{endIndex} of {totalItems}

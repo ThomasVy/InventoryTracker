@@ -61,8 +61,8 @@ const InventoryListContent: FunctionComponent<InventoryListContentProps> = () =>
   return (
     <>
       <TableBody>
-        {results.map((itemId) => (
-          <InventoryItem key={itemId} id={itemId} />
+        {results.map(({id} : {id : number}) => (
+          <InventoryItem key={id} id={id} />
         ))}
       </TableBody>
       <TableFooter>

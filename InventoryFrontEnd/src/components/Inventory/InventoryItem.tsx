@@ -46,7 +46,7 @@ const InventoryItem: FunctionComponent<InventoryItemProps> = ({ id }) => {
   if (isError) return fnDisplayAsSingleRowInTable(<pre>{error}</pre>);
   if (statusCode == 204)
     return fnDisplayAsSingleRowInTable(<h3>Item does not exist</h3>);
-
+    
   const quantityInShoppingCart = getItemQuantity(id);
 
   return (

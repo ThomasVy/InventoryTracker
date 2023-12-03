@@ -35,14 +35,15 @@ const PurchaseHistoryItem: FunctionComponent<PurchaseHistoryItemProps> = ({
   const date = new Date(data.date);
   const items = data.items;
   const displayFirstItem = () => {
-  const firstItemInOrder = items.at(0);
-  if (!firstItemInOrder) return <b> Error: No Items in Order </b>;
+    const firstItemInOrder = items.at(0);
+    if (!firstItemInOrder) return <b> Error: No Items in Order </b>;
 
     return (
       <>
         <DisplayConstItem
           id={firstItemInOrder.id}
           quantity={firstItemInOrder.quantity}
+          price={firstItemInOrder.price}
         />
       </>
     );
@@ -65,7 +66,7 @@ const PurchaseHistoryItem: FunctionComponent<PurchaseHistoryItemProps> = ({
         variant="outlined"
         sx={{
           width: 3 / 4,
-          maxWidth: "md",
+          maxWidth: "sm",
         }}
       >
         <CardActionArea component={RouterLink} to={`${PURCHASE_HISTORY_LINK.link}/${id}`}>
@@ -89,7 +90,7 @@ const PurchaseHistoryItem: FunctionComponent<PurchaseHistoryItemProps> = ({
                 {formatCurrency(
                   items.reduce(
                     (total, item) =>
-                      (total += item.quantity * item.individualPrice),
+                      (total += item.price),
                     0
                   )
                 )}
