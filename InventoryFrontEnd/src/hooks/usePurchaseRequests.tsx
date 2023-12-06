@@ -76,11 +76,11 @@ export function useGetIndividualPurchaseOrder(id: number, option?: Partial<Undef
   const { isLoading, isError, error, data, refetch } = useQuery({
     queryKey: [PURCHASE_LIST_KEY, id],
     queryFn: () => {
-      return privateInventoryRequest.get<Item>(`${PURCHASE_API}/${id}`); 
+      return privateInventoryRequest.get(`${PURCHASE_API}/${id}`); 
     },
     ...option
   });
-  const statusCode = data?.status;
+  const statusCode = data?.status ?? error?.response.status;
   const axiosData =  data?.data;
   return {
     isLoading,

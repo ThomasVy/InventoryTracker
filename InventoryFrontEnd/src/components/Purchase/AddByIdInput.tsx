@@ -22,7 +22,7 @@ const AddByIdInput: FunctionComponent<
       setIsError(true);
     } else {
       setItemId("")
-      addFunc(res.itemId, res.cost)
+      addFunc(res.id, res.cost)
     }
   }
   const {isLoading, refetch} = useGetInventoryItem(parseInt(itemId), false, onSuccessFunc);

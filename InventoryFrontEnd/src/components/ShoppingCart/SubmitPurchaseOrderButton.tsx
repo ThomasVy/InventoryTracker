@@ -4,15 +4,25 @@ import CheckIcon from "@mui/icons-material/Check";
 import { showToast } from "src/utilities/toast";
 import { useSendPurchaseOrder } from "src/hooks/usePurchaseRequests";
 import { PurchaseItemDetails } from "src/data/PurchaseConstants";
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { PURCHASE_HISTORY_LINK } from "src/data/LinkConstants";
+import { Box } from "@mui/material";
 
 interface SubmitPurchaseOrderButtonProps {
     shoppingCart : PurchaseItemDetails[];
     clearShoppingCart: () => void;
+    closeCart: () => void;
 }
  
-const SubmitPurchaseOrderButton: FunctionComponent<SubmitPurchaseOrderButtonProps> = ({shoppingCart, clearShoppingCart}) => {
+const SubmitPurchaseOrderButton: FunctionComponent<SubmitPurchaseOrderButtonProps> = ({shoppingCart, clearShoppingCart, closeCart}) => {
+    const navigate = useNavigate();
     const onSuccessSend = (id: number) => {
-        showToast(`Successfully created purchase #${id}`, "success");
+        const handleClick = () => {
+          closeCart()
+          navigate({ pathname: `${PURCHASE_HISTORY_LINK.link}/${id}` });
+        }
+        const display = <Box onClick={handleClick}>`Successfully created purchase ${id}`</Box>
+        showToast(display, "success");
         clearShoppingCart();
     }
     const onFailureSend = (error : string) => {

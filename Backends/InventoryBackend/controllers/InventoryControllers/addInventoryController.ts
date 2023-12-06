@@ -1,23 +1,24 @@
-import Inventory, {InventoryType} from '../../model/InventoryModel';
+import Inventory, { InventoryTypeExternal, InventoryZodExternal } from '../../model/InventoryModel';
 import { Response, Request } from "express";
 import { StatusError } from '../../types/error';
 import { SendError } from '../../utils/ErrorHandling';
+import { ZodError, z } from 'zod';
 
-type InterfaceAdd = Omit<InventoryType, "userId">; 
 
-async function handleAddInventory (req : Request<unknown, unknown, InterfaceAdd>, res: Response) {
+
+async function handleAddInventory(req: Request<unknown, unknown, InventoryTypeExternal>, res: Response) {
     try {
-        const {userId} = req;
-        const { name, stock, cost, reference, type, owner } = req.body;
-        if (!name || !stock || !cost ||!type || !userId || !owner ) {
-            throw new StatusError("name, stock, cost, type, and user are required.", {statusCode: 403});
-        }
-        const item = await Inventory.create({userId, name, stock, cost, type, reference, owner});
+        const { userId } = req;
+        const { name, stock, cost, reference, type, owner } = InventoryZodExternal.parse(req.body);
+        const item = await Inventory.create({ userId, name, stock, cost, type, reference, owner });
         if (!item) {
-            throw new StatusError("couldn't create item", {statusCode: 500});
+            throw new StatusError("couldn't create item", { statusCode: 500 });
         }
         res.status(200).json({ message: `Inventory item added` });
     } catch (error) {
+        if (error instanceof ZodError) {
+            error = new StatusError("name, stock, cost, type, and user are required.", { statusCode: 403 });
+        }
         SendError(res, error)
     }
 }

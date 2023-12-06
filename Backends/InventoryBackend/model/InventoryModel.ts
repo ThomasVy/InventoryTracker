@@ -1,19 +1,26 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, model } from "mongoose";
 import {autoIncrement} from 'mongoose-plugin-autoinc';
+import { z } from "zod";
 
-export interface InventoryType {
-  id?: Number,
-  name: String,
-  stock: Number,
-  cost: Number,
-  type: "Poster" | "Keychain" | "Other",
-  reference: String,
-  owner: String,
-  imageLink?: String,
-  userId: string;
-}
+const InventoryZodSchema = z.object({
+  id: z.number().optional(),
+  name: z.string(),
+  stock: z.number(),
+  cost: z.number(),
+  type: z.enum(["Poster", "Keychain", "Other"]),
+  reference: z.string(),
+  owner: z.string(),
+  imageLink: z.string().optional(),
+  userId: z.string()
+});
 
-const inventorySchema = new Schema<InventoryType>({
+export type InventoryTypeInternal = z.infer<typeof InventoryZodSchema>;
+
+export const InventoryZodExternal =  InventoryZodSchema.omit({userId: true});
+
+export type InventoryTypeExternal = z.infer<typeof InventoryZodExternal>;
+
+const inventorySchema = new Schema<InventoryTypeInternal>({
   id: Number,
   userId: String,
   name: String,

@@ -1,9 +1,8 @@
 import { Response } from "express";
 import { PaginationRequest } from "../../types/paginationTypes";
-import { InventoryType } from "../../model/InventoryModel";
+import { InventoryTypeInternal } from "../../model/InventoryModel";
 
-const handleListInventory = (req : PaginationRequest<InventoryType>, res: Response) => {
-    console.log(req.paginationResults);
+const handleListInventory = (req : PaginationRequest<InventoryTypeInternal>, res: Response) => {
     res.status(200).json(req.paginationResults);
 }
 

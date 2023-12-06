@@ -1,6 +1,6 @@
 import express from "express";
 import { paginatedResults } from "../middleware/pagination";
-import InventoryModel, { InventoryType } from "../model/InventoryModel";
+import InventoryModel from "../model/InventoryModel";
 import listInventoryController from '../controllers/InventoryControllers/listInventoryController';
 import deleteInventoryController from '../controllers/InventoryControllers/deleteItemController';
 import addInventoryController from '../controllers/InventoryControllers/addInventoryController';

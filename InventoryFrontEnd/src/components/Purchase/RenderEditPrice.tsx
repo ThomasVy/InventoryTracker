@@ -1,7 +1,6 @@
 import { Box, Button } from "@mui/material";
 import { FunctionComponent, useState } from "react";
 import CurrencyInput from "../CurrencyInput";
-import ConfirmationDialog from "../ConfirmationDialog";
 import { Mode } from "./RenderItemPrice";
 
 interface RenderEditPriceProps {
@@ -15,19 +14,11 @@ const RenderEditPrice: FunctionComponent<
   RenderEditPriceProps
 > = ({ totalPrice, setTotalPrice, setMode, editBoxWidth }) => {
   const [customPrice, setCustomPrice] = useState<string>(totalPrice.toFixed(2));  
-  const [openConfirmation, setOpenConfirmation] = useState<boolean>(false);
 
-  const handleConfirm = () => {
-    setTotalPrice(parseFloat(customPrice))
-    setMode("Normal");
-  };
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (parseFloat(customPrice) !== totalPrice) {
-        setOpenConfirmation(true);
-    } else {
-        setMode("Normal");
-    }
+    setTotalPrice(parseFloat(customPrice))
+    setMode("Normal");
   };
 
   return (
@@ -55,13 +46,6 @@ const RenderEditPrice: FunctionComponent<
           input={customPrice}
         />
       </Box>
-      <ConfirmationDialog
-        open={openConfirmation}
-        setOpen={setOpenConfirmation}
-        onConfirm={handleConfirm}
-      >
-        Are you sure you want to save <b>${customPrice}</b> as the total?
-      </ConfirmationDialog>
     </>
   );
 };

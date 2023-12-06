@@ -10,6 +10,7 @@ const LOGOUT_URL = "/logout";
 
 function useLogout() {
   const { setAuth } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const {clearShoppingCart} = useShoppingCart();
 
@@ -28,6 +29,8 @@ function useLogout() {
       clearShoppingCart();
       queryClient.removeQueries();
       setAuth(null);
+      navigate("/");
+      showToast("Successfully logged out", "success");
     } catch (error) {
       showToast("Could not reach server");
       return;

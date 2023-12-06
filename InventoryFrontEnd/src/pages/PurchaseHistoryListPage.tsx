@@ -5,7 +5,7 @@ import SearchBar from "src/components/SearchBar";
 
 interface PurchaseHistoryPageProps {}
 
-const PurchaseHistoryPage: FunctionComponent<PurchaseHistoryPageProps> = () => {
+const PurchaseHistoryListPage: FunctionComponent<PurchaseHistoryPageProps> = () => {
   return (
     <>
       <h1>Purchase History</h1>
@@ -15,4 +15,4 @@ const PurchaseHistoryPage: FunctionComponent<PurchaseHistoryPageProps> = () => {
   );
 };
 
-export default PurchaseHistoryPage;
+export default PurchaseHistoryListPage;

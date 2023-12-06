@@ -1,3 +1,4 @@
+import { Dayjs } from 'dayjs';
 export const PURCHASE_API = "/purchase";
 
 export const PURCHASE_LIST_KEY = "purchase_all";
@@ -10,6 +11,6 @@ export interface PurchaseItemDetails {
 
 export interface PurchaseOrder {
     id: number;
-    date: string,
+    date: Dayjs,
     items: PurchaseItemDetails[];
 }

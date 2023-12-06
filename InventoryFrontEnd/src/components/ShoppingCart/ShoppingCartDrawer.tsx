@@ -107,7 +107,7 @@ const ShoppingCartDrawer: FunctionComponent<ShoppingCartDrawerProps> = ({
             >
               Are you sure you want to clear the shopping cart?
             </ConfirmationDialog>
-            <SubmitPurchaseOrderButton clearShoppingCart={clearShoppingCart} shoppingCart={shoppingCart} />
+            <SubmitPurchaseOrderButton clearShoppingCart={clearShoppingCart} shoppingCart={shoppingCart} closeCart={closeCart} />
           </Stack>
         </Box>
       </Drawer>

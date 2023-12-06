@@ -6,6 +6,7 @@ import PurchaseModel from "../../model/PurchaseModel";
 const handleGetPurchaseOrder = async (req: Request, res: Response) => {
     try {
         const purchaseId = parseInt(req.params.purchaseId);
+
         const { userId } = req;
         if (!purchaseId) {
             throw new StatusError("No item id was supplied", {statusCode: 404});

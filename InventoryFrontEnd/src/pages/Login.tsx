@@ -19,6 +19,11 @@ const LOGIN_URL = "/login";
 
 function Login() {
   const { setAuth } = useAuth();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+
   const [isLoading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState(false);
   const usernameRef = useRef<HTMLInputElement | null>(null);
@@ -37,6 +42,7 @@ function Login() {
       );
       const data = response?.data;
       setAuth({ username: data?.username, accessToken: data?.accessToken });
+      navigate(from, { replace: true });
     } catch (err) {
       if (!err?.response) {
         showToast("No Server Response");
