@@ -16,7 +16,7 @@ function RenderListOfItems({ items, modifyItemFuncs, addFunc }: Props) {
   const totalPrice = items.reduce((total, item) => total+= item.price, 0);
   return (
     <>
-      <Stack direction="row" justifyContent="center">
+      <Stack direction="row">
         <AddByIdInput addFunc={addFunc} />
       </Stack>
       <Stack flexDirection="column">

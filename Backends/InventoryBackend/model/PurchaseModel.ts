@@ -1,20 +1,27 @@
 import { model, Schema, InferSchemaType, Types } from "mongoose";
 import {autoIncrement} from 'mongoose-plugin-autoinc';
+import {z} from "zod";
+import { FormatForExternal } from "../utils/FormatDataExternal";
 
-export interface IndividualPurchaseItem {
-    id: Number,
-    price: Number,
-    quantity: Number
-}
+const IndividualPurchaseItemZodSchema = z.object({
+    id: z.number().optional(),
+    price: z.number().positive({message: "Must be a postive number"}),
+    quantity: z.number().positive({message: "Must be a postive number"})
+});
 
-export interface PurchaseType {
-    id?: number,
-    userId: string,
-    date: Date,
-    items: Types.Array<IndividualPurchaseItem>
-}
+export type IndividualPurchaseItem = z.infer<typeof IndividualPurchaseItemZodSchema>;
 
-const purchaseSchema = new Schema({
+const PurchaseZodSchema = z.object({
+    id: z.number().optional(),
+    userId: z.string(),
+    date: z.coerce.date(),
+    items: z.array(IndividualPurchaseItemZodSchema).min(1, {message: "Must be at least one item"})
+});
+
+export const PurchaseExternalZodSchema = FormatForExternal(PurchaseZodSchema);
+
+export type PurchaseType = z.infer<typeof PurchaseZodSchema>;
+const purchaseSchema = new Schema<PurchaseType>({
     id : Number,
     userId: String,
     date: {

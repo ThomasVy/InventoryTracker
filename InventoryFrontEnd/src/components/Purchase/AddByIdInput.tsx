@@ -41,7 +41,6 @@ const AddByIdInput: FunctionComponent<
         onSubmit={submit}
         style={{
           display: "flex",
-          justifyContent: "center",
           gap: 10,
         }}
       >

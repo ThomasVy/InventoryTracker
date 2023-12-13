@@ -1,7 +1,7 @@
 import { Dayjs } from 'dayjs';
 export const PURCHASE_API = "/purchase";
 
-export const PURCHASE_LIST_KEY = "purchase_all";
+export const PURCHASE_LIST_KEY = "purchase";
 
 export interface PurchaseItemDetails {
     id: number;

@@ -3,7 +3,6 @@ import backendRequest from "../api/backendRequest";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   INVENTORY_ADD_API,
-  INVENTORY_ALL_REACT_QUERY_KEY,
   INVENTORY_LIST_API,
   INVENTORY_REACT_QUERY_KEY,
   InventoryItemDetails,
@@ -13,7 +12,7 @@ export function useGetInventory(page: number, limit: number) {
   const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
   const { isLoading, isError, error, data } = useQuery({
     queryKey: [
-      INVENTORY_ALL_REACT_QUERY_KEY,
+      INVENTORY_REACT_QUERY_KEY,
       {
         page,
         limit,
@@ -64,7 +63,7 @@ export function useAddInventoryItem(
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [INVENTORY_ALL_REACT_QUERY_KEY],
+        queryKey: [INVENTORY_REACT_QUERY_KEY],
       });
       onSuccessFunc();
     },
@@ -122,7 +121,7 @@ export function useDeleteInventoryItem(id: number) {
     onSuccess: () =>
       Promise.all([
         queryClient.invalidateQueries({
-          queryKey: [INVENTORY_ALL_REACT_QUERY_KEY],
+          queryKey: [INVENTORY_REACT_QUERY_KEY],
         }),
         queryClient.removeQueries({
           queryKey: [INVENTORY_REACT_QUERY_KEY, `${id}`],

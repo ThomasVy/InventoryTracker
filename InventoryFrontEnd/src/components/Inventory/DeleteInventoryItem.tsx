@@ -1,10 +1,8 @@
-import { LoadingButton } from "@mui/lab";
-import ConfirmationDialog from "../ConfirmationDialog";
-import { FunctionComponent, useState } from "react";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { FunctionComponent } from "react";
 import useShoppingCart from "src/hooks/useShoppingCart";
 import { showToast } from "src/utilities/toast";
 import { useDeleteInventoryItem } from "src/hooks/useInventoryRequests";
+import ConfirmationButton from "../ConfirmationButton";
 
 interface DeleteInventoryItemProps {
   id: number;
@@ -12,9 +10,8 @@ interface DeleteInventoryItemProps {
 }
 
 const DeleteInventoryItem: FunctionComponent<DeleteInventoryItemProps> = ({ id, name }) => {
-  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const { getItemQuantity } = useShoppingCart();
-  const {mutate, isLoading, isError, error} = useDeleteInventoryItem(id);
+  const { mutate, isLoading, isError, error } = useDeleteInventoryItem(id);
   const deleteItem = () => {
     const itemIsCurrentlyInCart = getItemQuantity(id) !== 0;
     if (itemIsCurrentlyInCart) {
@@ -25,27 +22,28 @@ const DeleteInventoryItem: FunctionComponent<DeleteInventoryItemProps> = ({ id, 
     }
     mutate();
   };
-  if (isError){
+  if (isError) {
     showToast(error, "error");
   }
   return (
     <>
-      <LoadingButton
-        onClick={() => setDeleteModalOpen(true)}
-        endIcon={<DeleteIcon />}
-        loading={isLoading}
-        loadingPosition="end"
+      <ConfirmationButton
+        dialogTitle={`Delete '${name}'?`}
+        dialogContent="Are you sure you want to delete this inventory item?"
+        onConfirm={() => deleteItem()}
+        buttonInfo={
+          {
+            type: "Loading",
+            isLoading: isLoading,
+            props: {
+              color: "error",
+              variant: "contained",
+            }
+          }
+        }
       >
         Delete
-      </LoadingButton>
-      <ConfirmationDialog
-        title={`Delete '${name}'?`}
-        open={deleteModalOpen}
-        setOpen={setDeleteModalOpen}
-        onConfirm={() => deleteItem()}
-      >
-        Are you sure you want to delete this inventory item?
-      </ConfirmationDialog>
+      </ConfirmationButton>
     </>
   );
 };

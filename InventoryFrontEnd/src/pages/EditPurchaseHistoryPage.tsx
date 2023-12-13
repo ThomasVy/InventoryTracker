@@ -7,17 +7,17 @@ import { useEffect, useState } from "react";
 import { PurchaseOrder } from "src/data/PurchaseConstants";
 import { showToast } from "src/utilities/toast";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ConfirmationDialog from "src/components/ConfirmationDialog";
 import { PURCHASE_HISTORY_LINK } from "src/data/LinkConstants";
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from "dayjs";
+import ConfirmationButton from '../components/ConfirmationButton';
+import SaveEditPurchaseButton from "src/components/EditPurchase/SaveEditPurchaseButton";
 
 function EditPurchaseHistoryPage() {
     const params = useParams();
     const [isDirty, setIsDirty] = useState(false);
     const [purchaseHistoryState, setPurchaseHistoryState] = useState<PurchaseOrder>();
-    const [openCancelModal, setOpenCancelModal] = useState(false);
     const navigate = useNavigate();
     if (!params.purchaseId) return <NotFound />;
     const purchaseId = parseInt(params.purchaseId);
@@ -26,7 +26,6 @@ function EditPurchaseHistoryPage() {
     const { data, error, isError, isLoading,
         statusCode
     } = useGetIndividualPurchaseOrder(purchaseId, { staleTime: Infinity, retry: 0 });
-
     useEffect(() => {
         if (!data) return;
         setPurchaseHistoryState({ ...data, date: dayjs(data.date) });
@@ -123,19 +122,12 @@ function EditPurchaseHistoryPage() {
             }
         });
     }
-    const handleBack = () => {
-        if (isDirty) {
-            setOpenCancelModal(true)
-        }
-        else {
-            navigate(PURCHASE_HISTORY_LINK.link);
-        }
-    }
     const handleDateChange = (value: dayjs.Dayjs | null) => {
         if (value === null) return;
 
         modifyPurchaseState(
             (prevState) => {
+                if (!prevState) return prevState;
                 return { ...prevState, date: value };
             }
         );
@@ -143,10 +135,29 @@ function EditPurchaseHistoryPage() {
     return (
         <>
             <Stack gap={2} >
+                <Stack direction="row">
+                    <ConfirmationButton
+                        buttonInfo={
+                            {
+                                type: "Normal",
+                                props: {
+                                    color: "warning",
+                                    variant: "contained",
+                                    endIcon: < ArrowBackIcon />
+                                }
+                            }
+                        }
+                        dialogTitle="Cancel your changes?"
+                        dialogContent="Are you sure you want to cancel your changes?"
+                        onConfirm={() => navigate(PURCHASE_HISTORY_LINK.link)}
+                        shouldConfirmationDialogOpen={() => isDirty}
+                    >
+                        Purchase History
+                    </ConfirmationButton>
+                </Stack>
                 <Typography variant="h4"> Purchase #{purchaseId} </Typography>
-                {/* <Typography variant="h6" color="text.secondary">{format(date, "PP") : "No date"}</Typography> */}
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker label="Basic date picker"
+                    <DatePicker label="Purchased On"
                         value={purchaseHistoryState.date}
                         format="MMM DD, YYYY"
                         onChange={handleDateChange}
@@ -158,26 +169,10 @@ function EditPurchaseHistoryPage() {
                     addFunc={addFunc}
                 />
                 <Stack direction="row" gap={4} justifyContent="space-between">
-                    <Button
-                        color="error"
-                        component="label"
-                        variant="contained"
-                        endIcon={<ArrowBackIcon />}
-                        onClick={handleBack}
-                    >
-                        Back
-                    </Button>
-                    <ConfirmationDialog
-                        title="Cancel your changes?"
-                        open={openCancelModal}
-                        setOpen={setOpenCancelModal}
-                        onConfirm={() => navigate(PURCHASE_HISTORY_LINK.link)}
-                    >
-                        Are you sure you want to cancel your changes?
-                    </ConfirmationDialog>
-                    <Button variant="contained">Save</Button>
+                    <Button variant="contained" color="error">Delete</Button>
+                    <SaveEditPurchaseButton setDirty={setIsDirty} isDirty={isDirty} purchaseHistoryState={purchaseHistoryState} purchaseId={purchaseId} />
                 </Stack>
-            </Stack>
+            </Stack >
         </>
     )
 }

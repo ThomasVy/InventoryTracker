@@ -21,7 +21,7 @@ const SubmitPurchaseOrderButton: FunctionComponent<SubmitPurchaseOrderButtonProp
           closeCart()
           navigate({ pathname: `${PURCHASE_HISTORY_LINK.link}/${id}` });
         }
-        const display = <Box onClick={handleClick}>`Successfully created purchase ${id}`</Box>
+        const display = <Box onClick={handleClick}>Successfully created purchase {id}</Box>
         showToast(display, "success");
         clearShoppingCart();
     }

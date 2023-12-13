@@ -5,8 +5,8 @@ import { z } from "zod";
 const InventoryZodSchema = z.object({
   id: z.number().optional(),
   name: z.string(),
-  stock: z.number(),
-  cost: z.number(),
+  stock: z.number().positive(),
+  cost: z.number().positive(),
   type: z.enum(["Poster", "Keychain", "Other"]),
   reference: z.string(),
   owner: z.string(),
