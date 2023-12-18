@@ -1,45 +1,36 @@
 import { SxProps, TextField, TextFieldProps, Theme } from "@mui/material";
-import { FunctionComponent, useState } from "react";
-import { z } from "zod";
+import { FunctionComponent } from "react";
 
-type WholeNumberInputProps = Omit<TextFieldProps, "onChange" | "value" | "onBlur"> & {
-  updateValue: (input: number) => void,
-  initValue: number,
+type WholeNumberInputProps = Omit<TextFieldProps, "value" | "onChange" | "type" | "onKeyDown" | "onBlur"> & {
+  value: number,
+  onChange: (newValue: number) => void,
   sx?: SxProps<Theme>
 };
 
-const WholeNumberParser = z.coerce.number().int().nonnegative();
 const WholeNumberInput: FunctionComponent<WholeNumberInputProps> = ({
-  updateValue,
   sx,
-  initValue,
+  value,
+  onChange,
   ...props
 }) => {
-  const [displayValue, setDisplayValue] = useState<string>(initValue.toString());
-  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const result = WholeNumberParser.safeParse(event.target.value);
-    if (result.success || event.target.value == "") {
-      setDisplayValue(event.target.value);
-    }
-  };
-  const handleBlur = (event :React.FocusEvent<HTMLInputElement>) => {
-    if (event.target.value == "") {
-      setDisplayValue("0");
-      updateValue(0);
-      return;
-    }
-    const value = WholeNumberParser.parse(event.target.value)
-    setDisplayValue(value.toString());
-    updateValue(value);
-  } 
 
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e.target.valueAsNumber);
+  }
+  const handleOnBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (isNaN(value)) {
+      onChange(0);
+    }
+  }
   return (
     <>
       <TextField
         sx={sx}
-        value={displayValue}
-        onBlur={handleBlur}
+        type="number"
+        onKeyDown={(evt) => ["e", "E", "+", "-", "."].includes(evt.key) && evt.preventDefault()}
+        value={isNaN(value) ? '' : value.toString()}
         onChange={handleOnChange}
+        onBlur={handleOnBlur}
         {...props}
       />
     </>

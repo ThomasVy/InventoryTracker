@@ -40,8 +40,8 @@ const RenderEditPrice: FunctionComponent<
           inputProps={{ style: { width: editBoxWidth, fontSize: 20, textAlign: "right" } }}
           autoFocus
           onFocus={(e) => e.target.select()}
-          updateValue={setCustomPrice}
-          initValue={customPrice}
+          value={customPrice}
+          onChange={setCustomPrice}
         />
       </Box>
     </>

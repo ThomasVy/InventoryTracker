@@ -1,39 +1,30 @@
 import { FormControl, InputAdornment, InputLabel, OutlinedInput, OutlinedInputProps, SxProps, Theme } from "@mui/material";
-import { FunctionComponent, useState } from "react";
-import {z} from "zod";
+import { FunctionComponent} from "react";
 
-type CurrencyInputProps = Omit<OutlinedInputProps, "onChange" | "value" | "onBlur"> & {
-  updateValue: (input: number) => void,
-  initValue: number,
+type CurrencyInputProps = Omit<OutlinedInputProps, "value" | "onChange" | "type" | "onKeyDown" | "onBlur"> & {
+  value: number,
+  onChange: (newValue: number) => void,
   sx?: SxProps<Theme>
 };
-const PostiveNumberSchema = z.coerce.number().nonnegative();
 
 const CurrencyInput: FunctionComponent<CurrencyInputProps> = ({
-  updateValue,
+  value, 
+  onChange,
   sx,
-  initValue,
   ...props
 }) => {
-  const [displayValue, setDisplayValue] = useState<string>(initValue.toString());
-  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const result = PostiveNumberSchema.safeParse(event.target.value);
-      if (result.success || event.target.value == "") {
-        setDisplayValue(event.target.value);
-      }
-  };
-  const handleBlur = (event :React.FocusEvent<HTMLInputElement>) => {
-    if (event.target.value == "") {
-      setDisplayValue("0");
-      updateValue(0);
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e.target.valueAsNumber);
+  }
+  const handleOnBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (isNaN(value)) {
+      onChange(0);
       return;
     }
-    const currencyValue = parseFloat(event.target.value).toFixed(2);
-    const value = PostiveNumberSchema.parse(currencyValue)
-    setDisplayValue(value.toString());
-    updateValue(value);
-  } 
-
+    const newValue = parseFloat(e.target.valueAsNumber.toFixed(2));
+    onChange(newValue);
+  }
   return (
     <>
       <FormControl sx={sx}>
@@ -41,10 +32,12 @@ const CurrencyInput: FunctionComponent<CurrencyInputProps> = ({
         <OutlinedInput
           id="outlined-adornment-amount"
           startAdornment={<InputAdornment position="start">$</InputAdornment>}
+          type="number"
+          onKeyDown={(evt) => ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()}
           label={props.label}
           onChange={handleOnChange}
-          onBlur={handleBlur}
-          value={displayValue}
+          onBlur={handleOnBlur}
+          value={isNaN(value) ? '': value.toString()}
           {...props}
         />
       </FormControl>

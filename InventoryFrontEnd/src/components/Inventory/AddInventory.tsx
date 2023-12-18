@@ -75,14 +75,14 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
       <WholeNumberInput
         label="Stock"
         required
-        initValue={stock}
-        updateValue={setStock}
+        value={stock}
+        onChange={setStock}
       />
       <CurrencyInput
         label="Cost"
         required
-        initValue={cost}
-        updateValue={setCost}
+        value={cost}
+        onChange={setCost}
       />
       <TextField
         select

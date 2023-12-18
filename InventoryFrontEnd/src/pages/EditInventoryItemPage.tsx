@@ -89,8 +89,8 @@ function EditInventoryItemPage({ }: EditInventoryItemPageProps) {
                         />
                         <CurrencyInput
                             label="Cost"
-                            updateValue={updateState("cost")}
-                            initValue={cost}
+                            value={cost}
+                            onChange={updateState("cost")}
                             sx={{ width: "24ch" }}
                         />
                     </Box>
@@ -104,9 +104,9 @@ function EditInventoryItemPage({ }: EditInventoryItemPageProps) {
                         />
                         <WholeNumberInput
                             label="Stock"
-                            initValue={stock}
-                            updateValue={updateState("stock")}
                             sx={{ width: "24ch" }}
+                            value={stock}
+                            onChange={updateState("stock")}
                         />
                     </Box>
                     <Box display="flex" alignItems="center" gap={2}>

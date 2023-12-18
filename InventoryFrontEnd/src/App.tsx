@@ -51,11 +51,12 @@ function App() {
       refreshAccess();
     }
   }, []);
-
+  
   const isLoggedIn = auth;
   if (isLoading) {
     return <h2>Loading...</h2>;
   }
+  
   return (
     <>
       <NavBar />
