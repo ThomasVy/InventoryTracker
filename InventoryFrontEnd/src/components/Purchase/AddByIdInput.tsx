@@ -1,7 +1,7 @@
 import { LoadingButton } from "@mui/lab";
 import { Box, TextField } from "@mui/material";
 import { FunctionComponent, useState } from "react";
-import { useGetInventoryItem } from "src/hooks/useInventoryRequests";
+import { useSearchInventoryItem } from "src/hooks/useInventoryRequests";
 import { showToast } from "src/utilities/toast";
 
 interface AddByIdInputProps {
@@ -21,11 +21,11 @@ const AddByIdInput: FunctionComponent<
       showToast("There was no data from the server response");
       setIsError(true);
     } else {
+      addFunc(parseInt(itemId), res.cost)
       setItemId("")
-      addFunc(res.id, res.cost)
     }
   }
-  const {isLoading, refetch} = useGetInventoryItem(parseInt(itemId), false, onSuccessFunc);
+  const {isLoading, refetch} = useSearchInventoryItem(parseInt(itemId), onSuccessFunc);
 
   const submit = (e) => {
     e.preventDefault();

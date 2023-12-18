@@ -16,9 +16,6 @@ async function handleAddInventory(req: Request<unknown, unknown, InventoryTypeEx
         }
         res.status(200).json({ message: `Inventory item added` });
     } catch (error) {
-        if (error instanceof ZodError) {
-            error = new StatusError("name, stock, cost, type, and user are required.", { statusCode: 403 });
-        }
         SendError(res, error)
     }
 }

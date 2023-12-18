@@ -11,7 +11,6 @@ const useRefreshToken = () => {
     const {clearShoppingCart} = useShoppingCart();
 
     const refresh = async () => {
-        console.log("Refresh was called");
         try {
             const response = await authRequest.get(REFRESH_URI);
             if (response.status == 403) {

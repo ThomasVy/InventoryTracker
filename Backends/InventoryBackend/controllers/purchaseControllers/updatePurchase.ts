@@ -2,32 +2,23 @@ import { Request, Response } from "express";
 import { SendError } from "../../utils/ErrorHandling";
 import { StatusError } from "../../types/error";
 import PurchaseModel, { PurchaseExternalZodSchema } from "../../model/PurchaseModel";
-import { ZodError } from "zod";
+import IdParser from "../../utils/IdParse";
 
 const handleUpdatePurchase = async (req: Request, res: Response) => {
     try {
-        const purchaseId = parseInt(req.params.purchaseId);
+        const id = IdParser.parse(req.params.purchaseId);
         const { userId } = req;
-        if (!purchaseId) {
-            throw new StatusError("No item id was supplied", {statusCode: 404});
-        }
-        const parsedPurchaseOrder = PurchaseExternalZodSchema.parse(req.body.purchaseOrder);
-        const purchaseOrder = await PurchaseModel.findOne({id: purchaseId, userId });
+        const sentPurchaseOrder = PurchaseExternalZodSchema.parse(req.body.purchaseOrder);
+        const purchaseOrder = await PurchaseModel.findOne({id, userId });
         if (!purchaseOrder) {
-            throw new StatusError(`No order with id ${purchaseId} exists`, {statusCode: 404});
-        }
-        if (parsedPurchaseOrder.items.length == 0) {
-            throw new StatusError("Cannot update order with no items", {statusCode: 403});
+            throw new StatusError(`No order with id ${id} exists`, {statusCode: 404});
         }
         
-        purchaseOrder.date = parsedPurchaseOrder.date;
-        purchaseOrder.items = parsedPurchaseOrder.items;
+        purchaseOrder.date = sentPurchaseOrder.date;
+        purchaseOrder.items = sentPurchaseOrder.items;
         await purchaseOrder.save();
-        res.status(200).json({ message: `Successfully updated purchase ${purchaseId}`, purchaseId });
+        res.status(200).json({ message: `Successfully updated purchase ${id}`, purchaseId: id });
     } catch (error) {
-        if (error instanceof ZodError) {
-            error = new StatusError(error.message, { statusCode: 403 });
-        }
         SendError(res, error);
     }
 };

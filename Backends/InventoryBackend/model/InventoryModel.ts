@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 import {autoIncrement} from 'mongoose-plugin-autoinc';
 import { z } from "zod";
+import { FormatForExternal } from "../utils/FormatDataExternal";
 
 const InventoryZodSchema = z.object({
   id: z.number().optional(),
@@ -16,7 +17,7 @@ const InventoryZodSchema = z.object({
 
 export type InventoryTypeInternal = z.infer<typeof InventoryZodSchema>;
 
-export const InventoryZodExternal =  InventoryZodSchema.omit({userId: true});
+export const InventoryZodExternal = FormatForExternal(InventoryZodSchema)
 
 export type InventoryTypeExternal = z.infer<typeof InventoryZodExternal>;
 

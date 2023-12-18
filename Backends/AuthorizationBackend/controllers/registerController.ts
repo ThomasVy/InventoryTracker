@@ -10,18 +10,18 @@ async function handleNewUser(req: Request<{}, {}, Login>, res: Response) {
   const { username, password } = req.body;
   if (!username || !password)
     return res
-      .status(400)
+      .status(403)
       .json({ message: "Username and password are required." });
 
   if (!USER_REGEX.test(username)) {
     return res
-      .status(401)
+      .status(403)
       .json({ message: "Username does not meet requirements." });
   }
 
   if (!PWD_REGEX.test(password)) {
     return res
-      .status(402)
+      .status(403)
       .json({ message: "Password does not meet requirements." });
   }
 

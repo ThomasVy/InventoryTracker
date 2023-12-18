@@ -4,8 +4,8 @@ import CheckIcon from "@mui/icons-material/Check";
 import { showToast } from "src/utilities/toast";
 import { useSendPurchaseOrder } from "src/hooks/usePurchaseRequests";
 import { PurchaseItemDetails } from "src/data/PurchaseConstants";
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { PURCHASE_HISTORY_LINK } from "src/data/LinkConstants";
+import { useNavigate } from 'react-router-dom';
+import { GetPurchaseEditLink, } from "src/data/LinkConstants";
 import { Box } from "@mui/material";
 
 interface SubmitPurchaseOrderButtonProps {
@@ -19,7 +19,7 @@ const SubmitPurchaseOrderButton: FunctionComponent<SubmitPurchaseOrderButtonProp
     const onSuccessSend = (id: number) => {
         const handleClick = () => {
           closeCart()
-          navigate({ pathname: `${PURCHASE_HISTORY_LINK.link}/${id}` });
+          navigate({ pathname: GetPurchaseEditLink(id) });
         }
         const display = <Box onClick={handleClick}>Successfully created purchase {id}</Box>
         showToast(display, "success");

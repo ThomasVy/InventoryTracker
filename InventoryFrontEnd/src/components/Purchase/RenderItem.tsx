@@ -18,7 +18,7 @@ const RenderItem: FunctionComponent<RenderItemProps> = ({
   price,
   modifyItemFuncs
 }) => {
-  const {name, imageLink, isLoading, isError, error} = useGetInventoryItem(id);
+  const {data, isLoading, isError, error} = useGetInventoryItem(id);
   if (isLoading) return <CircularProgress />;
   if (isError) {
     console.log(`Item doesn't exist ${error}`);
@@ -31,12 +31,12 @@ const RenderItem: FunctionComponent<RenderItemProps> = ({
       <Box
         component="img"
         alt="No Image"
-        src={imageLink}
+        src={data.imageLink}
         style={{ width: "150px", aspectRatio: 3 / 2, objectFit: "contain" }}
       />
       <Stack flexDirection="column" justifyContent="center" justifyItems="center">
         <Typography variant="h6">
-          [{id}] - {name}
+          [{id}] - {data.name}
         </Typography>
         <RenderItemModifyingButtons
           decreaseQuantity={decreaseQuantity}

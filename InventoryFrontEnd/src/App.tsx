@@ -14,6 +14,7 @@ import {
   INVENTORY_EDIT_LINK,
   INVENTORY_LINK,
   LOGIN_LINK,
+  PURCHASE_EDIT_LINK,
   PURCHASE_HISTORY_LINK,
   REGISTER_LINK,
 } from "./data/LinkConstants.tsx";
@@ -21,6 +22,7 @@ import useRefreshToken from "./hooks/useRefreshToken.tsx";
 import { useEffect, useState } from "react";
 import PurchaseHistory from "./pages/PurchaseHistoryListPage.tsx";
 import EditPurchaseHistoryPage from "./pages/EditPurchaseHistoryPage.tsx";
+import EditInventoryItemPage from "./pages/EditInventoryItemPage.tsx";
 
 //https://react.dev/learn/you-might-not-need-an-effect#initializing-the-application
 let didInit = false;
@@ -76,9 +78,9 @@ function App() {
           <Route element={<RequireAuth />}>
             <Route path={ADMIN_LINK.link} element={<Admin />} />
             <Route path={INVENTORY_LINK.link} element={<Inventory />} />
-            <Route path={INVENTORY_EDIT_LINK.link} element={<NotFound />} />
+            <Route path={INVENTORY_EDIT_LINK.link} element={<EditInventoryItemPage />} />
             <Route path={PURCHASE_HISTORY_LINK.link} element={<PurchaseHistory />} />
-            <Route path={`${PURCHASE_HISTORY_LINK.link}/:purchaseId`} element={<EditPurchaseHistoryPage />} />
+            <Route path={PURCHASE_EDIT_LINK.link} element={<EditPurchaseHistoryPage />} />
           </Route>
 
           <Route path="/" element={<Home />} />

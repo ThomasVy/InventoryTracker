@@ -28,7 +28,7 @@ export const CreateCustomPaginationActions = ({
 }: CreateCustomPaginationActionsProps) => {
   return ({ page }: PaginationAction) => {
     return (
-      <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+      <Box sx={{ flexShrink: 0 }}>
         <IconButton
           disabled={page === 0}
           onClick={() => setPage(0)}

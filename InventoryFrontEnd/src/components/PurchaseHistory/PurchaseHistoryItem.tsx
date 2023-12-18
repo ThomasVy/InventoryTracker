@@ -12,7 +12,7 @@ import { format } from "date-fns";
 import DisplayConstItem from "../Purchase/DisplayConstItem";
 import { formatCurrency } from "src/utilities/formatCurrency";
 import { Link as RouterLink } from 'react-router-dom';
-import { PURCHASE_HISTORY_LINK } from "src/data/LinkConstants";
+import { GetPurchaseEditLink } from "src/data/LinkConstants";
 import { useGetIndividualPurchaseOrder } from "src/hooks/usePurchaseRequests";
 
 interface PurchaseHistoryItemProps {
@@ -37,7 +37,6 @@ const PurchaseHistoryItem: FunctionComponent<PurchaseHistoryItemProps> = ({
   const displayFirstItem = () => {
     const firstItemInOrder = items.at(0);
     if (!firstItemInOrder) return <b> Error: No Items in Order </b>;
-
     return (
       <>
         <DisplayConstItem
@@ -64,18 +63,14 @@ const PurchaseHistoryItem: FunctionComponent<PurchaseHistoryItemProps> = ({
     <>
       <Card
         variant="outlined"
-        sx={{
-          width: 3 / 4,
-          maxWidth: "sm",
-        }}
       >
-        <CardActionArea component={RouterLink} to={`${PURCHASE_HISTORY_LINK.link}/${id}`}>
+        <CardActionArea component={RouterLink} to={GetPurchaseEditLink(id)}>
           <CardContent>
             <Typography sx={{ fontSize: 16 }} gutterBottom>
-              Order ID: <b>{id}</b>
+              Purchase ID: <b>{id}</b>
             </Typography>
             <Typography fontSize={14} color="text.secondary">
-              Purchased On: <b>{date ? format(date, "PP") : "No date"}</b>
+              Purchase Date: <b>{date ? format(date, "PP") : "No date"}</b>
             </Typography>
             {displayFirstItem()}
             {displayTextForMoreItems()}

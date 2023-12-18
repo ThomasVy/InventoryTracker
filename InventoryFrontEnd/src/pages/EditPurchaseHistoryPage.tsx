@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Stack, Typography } from "@mui/material";
+import { CircularProgress, Stack, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import RenderListOfItems from "src/components/Purchase/RenderListOfItems";
 import { useGetIndividualPurchaseOrder } from "src/hooks/usePurchaseRequests";
@@ -8,27 +8,29 @@ import { PurchaseOrder } from "src/data/PurchaseConstants";
 import { showToast } from "src/utilities/toast";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { PURCHASE_HISTORY_LINK } from "src/data/LinkConstants";
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from "dayjs";
 import ConfirmationButton from '../components/ConfirmationButton';
 import SaveEditPurchaseButton from "src/components/EditPurchase/SaveEditPurchaseButton";
+import DeleteEditPurchaseButton from "src/components/EditPurchase/DeleteEditPurchaseButton";
+import EditPurchaseDatePicker from "src/components/EditPurchase/EditPurchaseDatePicker";
+import { z } from "zod";
 
 function EditPurchaseHistoryPage() {
     const params = useParams();
     const [isDirty, setIsDirty] = useState(false);
     const [purchaseHistoryState, setPurchaseHistoryState] = useState<PurchaseOrder>();
     const navigate = useNavigate();
-    if (!params.purchaseId) return <NotFound />;
-    const purchaseId = parseInt(params.purchaseId);
-    if (isNaN(purchaseId)) return <NotFound />;
+    
+    const purchaseIdZodResult = z.coerce.number().positive().safeParse(params.purchaseId);
+    if (!purchaseIdZodResult.success) return <NotFound />;
+    const purchaseId = purchaseIdZodResult.data;
 
     const { data, error, isError, isLoading,
         statusCode
-    } = useGetIndividualPurchaseOrder(purchaseId, { staleTime: Infinity, retry: 0 });
+    } = useGetIndividualPurchaseOrder(purchaseId, { staleTime: Infinity, retry: 0, enabled: purchaseIdZodResult.success  });
+    
     useEffect(() => {
         if (!data) return;
-        setPurchaseHistoryState({ ...data, date: dayjs(data.date) });
+        setPurchaseHistoryState({ ...data });
     }, [data]);
 
     if (isLoading) return <CircularProgress />;
@@ -122,16 +124,6 @@ function EditPurchaseHistoryPage() {
             }
         });
     }
-    const handleDateChange = (value: dayjs.Dayjs | null) => {
-        if (value === null) return;
-
-        modifyPurchaseState(
-            (prevState) => {
-                if (!prevState) return prevState;
-                return { ...prevState, date: value };
-            }
-        );
-    }
     return (
         <>
             <Stack gap={2} >
@@ -155,21 +147,15 @@ function EditPurchaseHistoryPage() {
                         Purchase History
                     </ConfirmationButton>
                 </Stack>
-                <Typography variant="h4"> Purchase #{purchaseId} </Typography>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker label="Purchased On"
-                        value={purchaseHistoryState.date}
-                        format="MMM DD, YYYY"
-                        onChange={handleDateChange}
-                    />
-                </LocalizationProvider>
+                <Typography variant="h5"> Purchase ID: <b>{purchaseId}</b> </Typography>
+                <EditPurchaseDatePicker purchaseState={purchaseHistoryState} setPurchaseState={modifyPurchaseState}/>
                 <RenderListOfItems
                     items={items}
                     modifyItemFuncs={modifyItemFunctions}
                     addFunc={addFunc}
                 />
                 <Stack direction="row" gap={4} justifyContent="space-between">
-                    <Button variant="contained" color="error">Delete</Button>
+                    <DeleteEditPurchaseButton purchaseId={purchaseId} />
                     <SaveEditPurchaseButton setDirty={setIsDirty} isDirty={isDirty} purchaseHistoryState={purchaseHistoryState} purchaseId={purchaseId} />
                 </Stack>
             </Stack >

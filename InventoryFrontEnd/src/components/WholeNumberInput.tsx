@@ -1,28 +1,46 @@
-import { TextField, TextFieldProps } from "@mui/material";
-import { FunctionComponent } from "react";
+import { SxProps, TextField, TextFieldProps, Theme } from "@mui/material";
+import { FunctionComponent, useState } from "react";
+import { z } from "zod";
 
-interface WholeNumberInputProps {
-  textFieldProps: TextFieldProps;
-  setInput: React.Dispatch<React.SetStateAction<string>>;
-  input: string
-}
+type WholeNumberInputProps = Omit<TextFieldProps, "onChange" | "value" | "onBlur"> & {
+  updateValue: (input: number) => void,
+  initValue: number,
+  sx?: SxProps<Theme>
+};
 
+const WholeNumberParser = z.coerce.number().int().nonnegative();
 const WholeNumberInput: FunctionComponent<WholeNumberInputProps> = ({
-  textFieldProps,
-  setInput,
-  input
+  updateValue,
+  sx,
+  initValue,
+  ...props
 }) => {
-  const handleOnChange = (event) => {
-    const input = event.target.value.replace(/[^0-9]/g, "");
-    setInput(input);
+  const [displayValue, setDisplayValue] = useState<string>(initValue.toString());
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const result = WholeNumberParser.safeParse(event.target.value);
+    if (result.success || event.target.value == "") {
+      setDisplayValue(event.target.value);
+    }
   };
+  const handleBlur = (event :React.FocusEvent<HTMLInputElement>) => {
+    if (event.target.value == "") {
+      setDisplayValue("0");
+      updateValue(0);
+      return;
+    }
+    const value = WholeNumberParser.parse(event.target.value)
+    setDisplayValue(value.toString());
+    updateValue(value);
+  } 
 
   return (
     <>
       <TextField
-        {...textFieldProps}
-        value={input}
+        sx={sx}
+        value={displayValue}
+        onBlur={handleBlur}
         onChange={handleOnChange}
+        {...props}
       />
     </>
   );

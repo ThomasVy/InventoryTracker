@@ -13,11 +13,11 @@ interface RenderEditPriceProps {
 const RenderEditPrice: FunctionComponent<
   RenderEditPriceProps
 > = ({ totalPrice, setTotalPrice, setMode, editBoxWidth }) => {
-  const [customPrice, setCustomPrice] = useState<string>(totalPrice.toFixed(2));  
+  const [customPrice, setCustomPrice] = useState<number>(totalPrice);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setTotalPrice(parseFloat(customPrice))
+    setTotalPrice(customPrice)
     setMode("Normal");
   };
 
@@ -37,13 +37,11 @@ const RenderEditPrice: FunctionComponent<
         </Button>
         <Button type="submit">Save</Button>
         <CurrencyInput
-          textFieldProps={{
-            inputProps: { style: { width: editBoxWidth, fontSize: 20, textAlign: "right" } },
-            autoFocus: true,
-            onFocus: (e) => e.target.select(),
-          }}
-          setInput={setCustomPrice}
-          input={customPrice}
+          inputProps={{ style: { width: editBoxWidth, fontSize: 20, textAlign: "right" } }}
+          autoFocus
+          onFocus={(e) => e.target.select()}
+          updateValue={setCustomPrice}
+          initValue={customPrice}
         />
       </Box>
     </>

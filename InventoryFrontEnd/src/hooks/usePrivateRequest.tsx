@@ -6,7 +6,6 @@ import { AxiosInstance } from "axios";
 const useAuthPrivateRequest = (requester: AxiosInstance) => {
     const refresh = useRefreshToken();
     const { auth, setAuth } = useAuth();
-
     useEffect(() => {
 
         const requestIntercept = requester.interceptors.request.use(
@@ -22,11 +21,15 @@ const useAuthPrivateRequest = (requester: AxiosInstance) => {
             response => response,
             async (error) => {
                 const prevRequest = error?.config;
-                if (error?.response?.status === 403 && !prevRequest?.sent) {
+                if (error?.response?.status === 401 && !prevRequest?.sent) {
                     prevRequest.sent = true;
                     const newAccessToken = await refresh();
-                    if (newAccessToken == null) //Refresh token expired so we need to pass the error forward
+                    if (newAccessToken == null) {
+                        //Refresh token expired so we need to pass the error forward
+                        setAuth(null);
+                        console.log("refresh token expired so setting auth to null");
                         return Promise.reject(error);
+                    }
                     prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
                     return requester(prevRequest);
                 }

@@ -1,19 +1,15 @@
 import { FunctionComponent } from "react";
 import {
   Box,
-  Button,
   CircularProgress,
   TableCell,
   TableRow,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import { Link } from "react-router-dom";
-import { INVENTORY_LINK } from "src/data/LinkConstants";
 import { useGetInventoryItem } from "src/hooks/useInventoryRequests";
 import { formatCurrency } from "src/utilities/formatCurrency";
-import DeleteInventoryItem from "./DeleteInventoryItem";
 import RenderItemModifyingButtons from "../Purchase/RenderItemModifyingButtons";
 import useShoppingCart from "src/hooks/useShoppingCart";
+import EditInventoryButton from "./EditInventoryButton";
 
 interface InventoryItemProps {
   id: number;
@@ -35,12 +31,7 @@ const InventoryItem: FunctionComponent<InventoryItemProps> = ({ id }) => {
     isError,
     error,
     statusCode,
-    name,
-    reference,
-    type,
-    stock,
-    cost,
-    owner,
+    data
   } = useGetInventoryItem(id);
   if (isLoading) return fnDisplayAsSingleRowInTable(<CircularProgress />);
   if (isError) return fnDisplayAsSingleRowInTable(<pre>{error}</pre>);
@@ -62,14 +53,14 @@ const InventoryItem: FunctionComponent<InventoryItemProps> = ({ id }) => {
               justifyContent: "space-between",
             }}
           >
-            {name}
+            {data.name}
             <RenderItemModifyingButtons
               decreaseQuantity={() => {
                 decreaseCartQuantity(id);
               }}
               increaseQuantity={() => {
                 if (quantityInShoppingCart == 0) {
-                  addToCart(id, cost);
+                  addToCart(id, data.cost);
                 } else {
                   increaseCartQuantity(id);
                 }
@@ -81,20 +72,13 @@ const InventoryItem: FunctionComponent<InventoryItemProps> = ({ id }) => {
             />
           </Box>
         </TableCell>
-        <TableCell align="left">{owner}</TableCell>
-        <TableCell align="left">{reference ? reference : "-"}</TableCell>
-        <TableCell align="left">{type}</TableCell>
-        <TableCell align="left">{stock}</TableCell>
-        <TableCell align="left">{formatCurrency(cost)}</TableCell>
+        <TableCell align="left">{data.owner}</TableCell>
+        <TableCell align="left">{data.reference ?? "-"}</TableCell>
+        <TableCell align="left">{data.type}</TableCell>
+        <TableCell align="left">{data.stock}</TableCell>
+        <TableCell align="left">{formatCurrency(data.cost)}</TableCell>
         <TableCell align="left">
-          <Button
-            component={Link}
-            to={`${INVENTORY_LINK.link}/${id}/edit`}
-            startIcon={<EditIcon />}
-          >
-            Edit
-          </Button>
-          <DeleteInventoryItem id={id} name={name} />
+          <EditInventoryButton id={id}/>
         </TableCell>
       </TableRow>
     </>

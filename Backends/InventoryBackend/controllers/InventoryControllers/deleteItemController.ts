@@ -9,7 +9,8 @@ const handleDeleteItem = async (req : Request, res : Response) => {
         if (isNaN(itemId)) {
             throw new StatusError("item id not supplied as a number", {statusCode: 403});
         }
-        await InventoryModel.deleteOne({id: itemId});
+        const {userId} = req;
+        await InventoryModel.deleteOne({userId, id: itemId});
         return res.sendStatus(200);
     } catch (error) {
         SendError(res, error);

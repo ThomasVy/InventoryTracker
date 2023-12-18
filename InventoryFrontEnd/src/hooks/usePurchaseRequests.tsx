@@ -2,6 +2,8 @@ import useAuthPrivateRequest from "./usePrivateRequest";
 import backendRequest from "../api/backendRequest";
 import { UndefinedInitialDataOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PURCHASE_API, PURCHASE_LIST_KEY, PurchaseItemDetails, PurchaseOrder } from "src/data/PurchaseConstants";
+import { AxiosError } from "axios";
+import { PaginationResults } from "src/data/PaginationConstants";
 
 export function useSendPurchaseOrder(onSuccessFunc: (id: number) => void, onErrorFunc: (error: string) => void) {
   const privatePurchaseRequest = useAuthPrivateRequest(backendRequest);
@@ -11,7 +13,7 @@ export function useSendPurchaseOrder(onSuccessFunc: (id: number) => void, onErro
     mutationFn: (purchaseOrder: PurchaseItemDetails[]) => {
       return privatePurchaseRequest.post(
         PURCHASE_API,
-        JSON.stringify({ purchaseList: purchaseOrder })
+        JSON.stringify({ purchaseOrder })
       );
     },
     onSuccess: (data) => {
@@ -44,7 +46,7 @@ export function useGetPurchaseHistory(page: number, limit: number) {
       },
     ],
     queryFn: () => {
-      return privatePurchaseRequest.get(PURCHASE_API, {
+      return privatePurchaseRequest.get<PaginationResults<{id: number}>>(PURCHASE_API, {
         params: {
           page,
           limit
@@ -52,25 +54,16 @@ export function useGetPurchaseHistory(page: number, limit: number) {
       });
     },
   });
-  const statusCode = data?.data;
-  const results = data?.data.results;
-  const previousPage = data?.data.previousPage;
-  const nextPage = data?.data.nextPage;
-  const maxPage = data?.data.maxPage;
-  const totalItems = data?.data.totalItems;
-
+  
   return {
     isLoading,
     isError,
     error: JSON.stringify(error),
-    statusCode,
-    results,
-    previousPage,
-    nextPage,
-    maxPage,
-    totalItems,
+    statusCode: data?.status,
+    data: data?.data
   };
 }
+
 export function useGetIndividualPurchaseOrder(id: number, option?: Partial<UndefinedInitialDataOptions>) {
   const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
   const { isLoading, isError, error, data, refetch } = useQuery({
@@ -78,7 +71,7 @@ export function useGetIndividualPurchaseOrder(id: number, option?: Partial<Undef
     queryFn: () => {
       return privateInventoryRequest.get(`${PURCHASE_API}/${id}`);
     },
-    ...option
+    ...option,
   });
   const statusCode = data?.status ?? error?.response.status;
   const axiosData = data?.data;
@@ -98,14 +91,9 @@ export function useUpdatePurchase(id: number, onSuccessFunc: (id: number) => voi
 
   const { isPending, mutate } = useMutation({
     mutationFn: (purchaseOrder: PurchaseOrder) => {
-      const apiPurchaseOrder = {
-        id: purchaseOrder.id,
-        date: purchaseOrder.date.toDate(),
-        items: purchaseOrder.items
-      };
       return privatePurchaseRequest.put(
         `${PURCHASE_API}/${id}`,
-        JSON.stringify({ purchaseOrder: apiPurchaseOrder })
+        JSON.stringify({ purchaseOrder })
       );
     },
     onSuccess: (data) => {
@@ -117,10 +105,36 @@ export function useUpdatePurchase(id: number, onSuccessFunc: (id: number) => voi
         onErrorFunc("No data was sent back");
       }
     },
-    onError: (error: Error) => {
-      onErrorFunc(JSON.stringify(error));
+    onError: (error: AxiosError) => {
+      onErrorFunc(error.response?.data?.message);
     },
   });
 
   return { mutate, isLoading: isPending };
+}
+
+export function useDeletePurchase(id: number, onSuccessFunc: (id: number) => void, onErrorFunc: (error: string) => void) {
+  const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
+  const queryClient = useQueryClient();
+  const { mutate, isPending: isLoading } = useMutation({
+    mutationFn: () => {
+      return privateInventoryRequest.delete(`${PURCHASE_API}/${id}`);
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: [PURCHASE_LIST_KEY],
+        }),
+        queryClient.removeQueries({
+          queryKey: [PURCHASE_LIST_KEY, id],
+        }),
+      ])
+      onSuccessFunc(id);
+    },
+    onError: (error: AxiosError) => {
+      onErrorFunc(error.response?.data?.message);
+    },
+  });
+
+  return { mutate, isLoading };
 }

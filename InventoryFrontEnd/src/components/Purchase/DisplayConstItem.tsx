@@ -10,7 +10,7 @@ const DisplayConstItem: FunctionComponent<PurchaseItemDetails> = ({
   quantity,
   price
 }) => {
-  const { name, imageLink, isLoading, isError, error } = useGetInventoryItem(id);
+  const { data, isLoading, isError, error } = useGetInventoryItem(id);
   if (isLoading) return <CircularProgress />;
   if (isError) {
     console.log(`Item doesn't ${error}`);
@@ -25,8 +25,8 @@ const DisplayConstItem: FunctionComponent<PurchaseItemDetails> = ({
       >
         <Box
           component="img"
-          alt="No Image"
-          src={imageLink}
+          alt="Item Image Missing (Item may have been deleted)"
+          src={data.imageLink}
           style={{ width: "130px", aspectRatio: 3 / 2, objectFit: "contain" }}
         />
         <Stack
@@ -36,7 +36,7 @@ const DisplayConstItem: FunctionComponent<PurchaseItemDetails> = ({
         >
           <Stack direction="row" alignItems="center">
             <Typography fontSize={18} color="text.secondary">
-              {name}
+              {data.name ?? "(The item may have been deleted)"}
             </Typography>
             <Typography sx={{ fontSize: 14, marginLeft: 2 }} color="text.secondary">
               x{quantity}

@@ -16,6 +16,7 @@ const SaveEditPurchaseButton = ({ purchaseId, isDirty, setDirty, purchaseHistory
         showToast(`Successfully updated purchase order ${id}`, "success");
     }
     const onErrorFunc = (error: string) => {
+        
         showToast(error, "error");
     }
     const { mutate, isLoading } = useUpdatePurchase(purchaseId, onSuccessFunc, onErrorFunc)

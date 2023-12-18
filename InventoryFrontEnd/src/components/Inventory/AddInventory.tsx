@@ -8,19 +8,19 @@ import WholeNumberInput from "../WholeNumberInput";
 import { showToast } from "src/utilities/toast";
 import useAuth from "src/hooks/useAuth";
 import { useAddInventoryItem } from "src/hooks/useInventoryRequests";
-interface AddInventoryProps {}
+interface AddInventoryProps { }
 
 const AddInventory: FunctionComponent<AddInventoryProps> = () => {
-  const {auth} = useAuth();
+  const { auth } = useAuth();
   const [productName, setProductName] = useState("");
-  const [stock, setStock] = useState("");
-  const [cost, setCost] = useState("");
+  const [stock, setStock] = useState<number>(0);
+  const [cost, setCost] = useState<number>(0);
   const [reference, setReference] = useState("");
   const [productType, setProductType] = useState("Poster");
   const [owner, setOwner] = useState(auth ? auth.username : "");
   const onSuccessFunc = () => {
-    setStock("");
-    setCost("");
+    setStock(0);
+    setCost(0);
     setProductName("");
     setReference("");
     setOwner(auth ? auth.username : "");
@@ -29,7 +29,7 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
   const onFailureFunc = (error: string) => {
     showToast(`Failed to Add ${error}`, "error");
   }
-  const {mutate, isPending} = useAddInventoryItem(onSuccessFunc, onFailureFunc);
+  const { mutate, isPending } = useAddInventoryItem(onSuccessFunc, onFailureFunc);
   const handleAddInventory = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -43,8 +43,8 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
     mutate({
       itemId: -1,
       name: productName,
-      stock: parseInt(stock),
-      cost: parseInt(cost),
+      stock: stock,
+      cost: cost,
       reference: reference,
       type: productType,
       owner: owner,
@@ -73,20 +73,16 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
         label="Product Name"
       />
       <WholeNumberInput
-        textFieldProps={{
-          label: "Stock",
-          required: true,
-        }}
-        setInput={setStock}
-        input={stock}
+        label="Stock"
+        required
+        initValue={stock}
+        updateValue={setStock}
       />
       <CurrencyInput
-        textFieldProps={{
-          label: "Cost",
-          required: true,
-        }}
-        setInput={setCost}
-        input={cost}
+        label="Cost"
+        required
+        initValue={cost}
+        updateValue={setCost}
       />
       <TextField
         select

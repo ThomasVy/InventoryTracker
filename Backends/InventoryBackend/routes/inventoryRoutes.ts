@@ -5,11 +5,14 @@ import listInventoryController from '../controllers/InventoryControllers/listInv
 import deleteInventoryController from '../controllers/InventoryControllers/deleteItemController';
 import addInventoryController from '../controllers/InventoryControllers/addInventoryController';
 import getInventoryItemController from '../controllers/InventoryControllers/getItemController';
+import handleUpdateInventoryItem from "../controllers/InventoryControllers/updateInventoryItem";
 const router = express.Router()
 
 router.get("/", paginatedResults(InventoryModel), listInventoryController);
-router.delete("/:itemId", deleteInventoryController);
 router.post("/add", addInventoryController);
-router.get("/:itemId", getInventoryItemController)
+
+router.delete("/:itemId", deleteInventoryController);
+router.put("/:itemId", handleUpdateInventoryItem);
+router.get("/:itemId", getInventoryItemController);
 
 export default router;

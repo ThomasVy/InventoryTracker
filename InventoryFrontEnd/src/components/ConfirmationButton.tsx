@@ -1,6 +1,6 @@
-import { ReactNode, useState, Children, cloneElement } from 'react'
+import { ReactNode, useState } from 'react'
 import ConfirmationDialog from './ConfirmationDialog'
-import { Button, ButtonProps, IconButton, IconButtonProps, ButtonBaseProps } from '@mui/material'
+import { Button, ButtonProps, IconButton, IconButtonProps } from '@mui/material'
 import { LoadingButton, LoadingButtonProps } from '@mui/lab';
 
 
@@ -59,7 +59,6 @@ const ConfirmationButton = ({ children, dialogTitle, dialogContent, onConfirm, s
                 <LoadingButton
                     onClick={handleButtonClick}
                     loading={buttonInfo.isLoading}
-                    loadingPosition="end"
                     {...buttonInfo.props}
                 >
                     {children}

@@ -9,10 +9,10 @@ const TOAST_FUNCTIONS = {
 }
 const TOAST_DEFAULT_OPTIONS : ToastOptions= {
     position: "top-left",
-    autoClose: 5000,
+    autoClose: 3000,
     hideProgressBar:false,
     closeOnClick : true,
-    pauseOnHover: true,
+    pauseOnHover: false,
     draggable : true,
     progress: undefined,
     theme: "dark"
