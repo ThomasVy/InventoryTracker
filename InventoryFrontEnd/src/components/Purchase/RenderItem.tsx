@@ -9,7 +9,7 @@ import { ModifyingItemFuncs } from "src/data/ItemConstants";
 import { PurchaseItemDetails } from "src/data/PurchaseConstants";
 
 interface RenderItemProps extends PurchaseItemDetails {
-  modifyItemFuncs : (id: number) => ModifyingItemFuncs;
+  modifyItemFuncs: (id: number) => ModifyingItemFuncs;
 }
 
 const RenderItem: FunctionComponent<RenderItemProps> = ({
@@ -18,7 +18,7 @@ const RenderItem: FunctionComponent<RenderItemProps> = ({
   price,
   modifyItemFuncs
 }) => {
-  const {data, isLoading, isError, error} = useGetInventoryItem(id);
+  const { data, isLoading, isError, error } = useGetInventoryItem(id);
   if (isLoading) return <CircularProgress />;
   if (isError) {
     console.log(`Item doesn't exist ${error}`);
@@ -27,17 +27,22 @@ const RenderItem: FunctionComponent<RenderItemProps> = ({
   const { decreaseQuantity, increaseQuantity, removeAllQuantity, setPrice } = modifyItemFuncs(id);
 
   return (
-    <Stack direction="row" gap={3} sx={{ py: 2, borderBottom: 1, borderColor: 'grey.500'}} alignItems="center">
+    <Stack direction="row" gap={3} sx={{ py: 2, borderBottom: 1, borderColor: 'grey.500' }} alignItems="center">
       <Box
         component="img"
-        alt="No Image"
+        alt="Image Missing"
         src={data.imageLink}
         style={{ width: "150px", aspectRatio: 3 / 2, objectFit: "contain" }}
       />
       <Stack flexDirection="column" justifyContent="center" justifyItems="center">
-        <Typography variant="h6">
-          [{id}] - {data.name}
-        </Typography>
+        <Stack direction="row" alignItems="center">
+          <Typography variant="subtitle1" color="text.secondary">
+            [ID# {id}]&nbsp;
+          </Typography>
+          <Typography variant="h6" color={data.name ? "text.primary" : "text.secondary"}>
+            {data.name ?? <i>(Item was deleted)</i>}
+          </Typography>
+        </Stack>
         <RenderItemModifyingButtons
           decreaseQuantity={decreaseQuantity}
           increaseQuantity={increaseQuantity}
@@ -45,7 +50,7 @@ const RenderItem: FunctionComponent<RenderItemProps> = ({
           removeAllQuantity={removeAllQuantity}
         />
         <Typography fontSize={14} variant="subtitle1">
-            Price per Item: {formatCurrency(price/quantity)}
+          Price per Item: {formatCurrency(price / quantity)}
         </Typography>
       </Stack>
       <Box

@@ -35,7 +35,7 @@ export function useSendPurchaseOrder(onSuccessFunc: (id: number) => void, onErro
   return { mutate, isLoading: isPending };
 }
 
-export function useGetPurchaseHistory(page: number, limit: number) {
+export function useGetPurchaseHistory(page: number, limit: number, searchTerm: string) {
   const privatePurchaseRequest = useAuthPrivateRequest(backendRequest);
   const { isLoading, isError, error, data } = useQuery({
     queryKey: [
@@ -43,13 +43,15 @@ export function useGetPurchaseHistory(page: number, limit: number) {
       {
         page,
         limit,
+        searchTerm
       },
     ],
     queryFn: () => {
       return privatePurchaseRequest.get<PaginationResults<{id: number}>>(PURCHASE_API, {
         params: {
           page,
-          limit
+          limit,
+          searchTerm
         },
       });
     },

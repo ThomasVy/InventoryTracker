@@ -11,10 +11,12 @@ import {
 import { CreateCustomPaginationActions } from "../CreateCustomPaginationActions";
 import { useGetInventory } from "src/hooks/useInventoryRequests";
 
-interface InventoryListContentProps {}
+interface InventoryListContentProps {
+  searchTerm: string
+}
 const LIMIT_OPTIONS = [5, 10, 25, { label: "All", value: -1 }];
 
-const InventoryListContent: FunctionComponent<InventoryListContentProps> = () => {
+const InventoryListContent: FunctionComponent<InventoryListContentProps> = ({searchTerm}) => {
   const [limit, setLimit] = useState<number>(5);
   const [page, setPage] = useState<number>(0);
   const {
@@ -27,7 +29,7 @@ const InventoryListContent: FunctionComponent<InventoryListContentProps> = () =>
     nextPage,
     maxPage,
     totalItems,
-  } = useGetInventory(page, limit);
+  } = useGetInventory(page, limit, searchTerm);
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {

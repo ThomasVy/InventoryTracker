@@ -9,9 +9,11 @@ import {
 } from "@mui/material";
 import InventoryListContent from "./InventoryListContent";
 
-interface InventoryListProps {}
+interface InventoryListProps {
+  searchTerm: string
+}
 
-const InventoryList: FunctionComponent<InventoryListProps> = () => {
+const InventoryList: FunctionComponent<InventoryListProps> = ({searchTerm}) => {
   return (
     <>
       <TableContainer component={Paper} sx={{ width: "80vw", maxWidth: "lg" }}>
@@ -38,7 +40,7 @@ const InventoryList: FunctionComponent<InventoryListProps> = () => {
               <TableCell align="left">Modify</TableCell>
             </TableRow>
           </TableHead>
-          <InventoryListContent />
+          <InventoryListContent searchTerm={searchTerm}/>
         </Table>
       </TableContainer>
     </>

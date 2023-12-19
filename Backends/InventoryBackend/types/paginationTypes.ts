@@ -18,4 +18,3 @@ interface PaginationQuery {
 export interface PaginationRequest<T> extends Request<unknown, unknown, unknown, PaginationQuery>{
     paginationResults?: PaginationResults<T>;
 }
-  

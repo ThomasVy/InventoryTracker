@@ -25,7 +25,7 @@ const DisplayConstItem: FunctionComponent<PurchaseItemDetails> = ({
       >
         <Box
           component="img"
-          alt="Item Image Missing (Item may have been deleted)"
+          alt="Image Missing"
           src={data.imageLink}
           style={{ width: "130px", aspectRatio: 3 / 2, objectFit: "contain" }}
         />
@@ -35,8 +35,8 @@ const DisplayConstItem: FunctionComponent<PurchaseItemDetails> = ({
           flexWrap="wrap"
         >
           <Stack direction="row" alignItems="center">
-            <Typography fontSize={18} color="text.secondary">
-              {data.name ?? "(The item may have been deleted)"}
+            <Typography fontSize={18} color={data.name ? "text.primary" : "text.secondary"}>
+              {data.name ?? <i>(Item was deleted)</i>}
             </Typography>
             <Typography sx={{ fontSize: 14, marginLeft: 2 }} color="text.secondary">
               x{quantity}

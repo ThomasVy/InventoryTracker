@@ -9,7 +9,7 @@ import {
 } from "src/data/InventoryConstants";
 import { AxiosError } from "axios";
 
-export function useGetInventory(page: number, limit: number) {
+export function useGetInventory(page: number, limit: number, search?: string) {
   const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
   const { isLoading, isError, error, data } = useQuery({
     queryKey: [
@@ -17,13 +17,15 @@ export function useGetInventory(page: number, limit: number) {
       {
         page,
         limit,
+        search
       },
     ],
     queryFn: () => {
       return privateInventoryRequest.get(INVENTORY_LIST_API, {
         params: {
-          page: page,
-          limit: limit,
+          page,
+          limit,
+          search
         },
       });
     },
