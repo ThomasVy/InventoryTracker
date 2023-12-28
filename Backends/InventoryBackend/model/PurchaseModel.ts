@@ -1,45 +1,56 @@
-import { model, Schema, InferSchemaType, Types } from "mongoose";
-import {autoIncrement} from 'mongoose-plugin-autoinc';
+import { model, Schema, InferSchemaType, Types} from "mongoose";
 import {z} from "zod";
-import { FormatForExternal } from "../utils/FormatDataExternal";
-import IdParser from "../utils/IdParse";
 
 const IndividualPurchaseItemZodSchema = z.object({
-    id: IdParser.optional(),
-    price: z.number().positive({message: "Must be a postive number"}),
-    quantity: z.number().positive({message: "Must be a postive number"})
+    id: z.string(),
+    price: z.number().nonnegative({message: "Must be >0 number"}),
+    quantity: z.number().nonnegative({message: "Must be >0 number"})
 });
 
-export type IndividualPurchaseItem = z.infer<typeof IndividualPurchaseItemZodSchema>;
-export const PurchaseItemListZodSchema = z.array(IndividualPurchaseItemZodSchema).min(1, {message: "Must be at least one item"});
-
-const PurchaseZodSchema = z.object({
-    id: IdParser.optional(),
+export const purchaseEntitySchema = z.object({
+    _id: z.instanceof(Types.ObjectId),
     userId: z.string(),
     date: z.coerce.date(),
-    items: PurchaseItemListZodSchema
-});
+    items: z.array(IndividualPurchaseItemZodSchema).min(1, {message: "Must be at least one item"})
+})
 
-export const PurchaseExternalZodSchema = FormatForExternal(PurchaseZodSchema);
+export type PurchaseEntity = z.infer<typeof purchaseEntitySchema>;
 
-export type PurchaseType = z.infer<typeof PurchaseZodSchema>;
-const purchaseSchema = new Schema<PurchaseType>({
-    id : Number,
+const purchaseDTOSchema = purchaseEntitySchema.omit({_id: true, userId: true}).merge(z.object({id: z.string()}));
+
+export type PurchaseDTO = z.infer<typeof purchaseDTOSchema>;
+
+const purchaseDTOMiniSchema = purchaseDTOSchema.pick({id: true});
+type PurchaseDTOMini = z.infer<typeof purchaseDTOMiniSchema>;
+
+export const PurchaseDTO = {
+    convertFromEntity({_id, ...entity}: PurchaseEntity): PurchaseDTO {
+        const candidate: PurchaseDTO = {
+            id: _id.toHexString(),
+            ...entity
+        }
+        return purchaseDTOSchema.parse(candidate);
+    },
+    convertToMiniDTO({_id}: PurchaseEntity) {
+        const candidate : PurchaseDTOMini = {
+            id: _id.toHexString()
+        }
+        return purchaseDTOMiniSchema.parse(candidate);
+    }
+}
+
+const purchaseSchema = new Schema<PurchaseEntity>({
     userId: String,
     date: {
         type: Date,
-        default: Date.now,
     },
     items: [
         {
-            id: Number,
+            id: String,
             price: Number,
             quantity: Number,
         },
     ],
 });
-purchaseSchema.plugin(autoIncrement, { model: 'Purchase', field: 'id', startAt: 1 });
 
-export type purchaseModelType = InferSchemaType<typeof purchaseSchema>;
-
-export default model("Purchase", purchaseSchema);
+export const Purchase =  model("Purchase", purchaseSchema);

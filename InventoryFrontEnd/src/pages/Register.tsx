@@ -1,10 +1,9 @@
 import { Link as RouterLink } from "react-router-dom";
-import { FunctionComponent, RefObject, useRef, useState } from "react";
+import { FunctionComponent, useRef, useState } from "react";
 import authRequest from "../api/authRequest";
 import { AxiosError } from "axios";
 import {
   Box,
-  Button,
   Container,
   Grid,
   Link,
@@ -12,10 +11,8 @@ import {
   Typography,
 } from "@mui/material";
 import HiddenInput from "src/components/HiddenInput";
-import AlertMsg from "src/components/Alert";
-import useVerification, { ServerMessageType } from "src/hooks/useVerification";
-import LoadingComponent from "src/components/LoadingComponent";
 import { showToast } from "src/utilities/toast";
+import { LoadingButton } from "@mui/lab";
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 const REGISTER_URL = "/register";
@@ -26,20 +23,20 @@ const USERNAME_REQUIREMENT =
 const CONFIRM_PASSWORD_REQUIREMENT = "Must match Password.";
 
 interface Error {
-  password : boolean;
+  password: boolean;
   confirmPassword: boolean;
-  username : boolean;
+  username: boolean;
 };
 
-interface RegisterProps {}
+interface RegisterProps { }
 const Register: FunctionComponent<RegisterProps> = () => {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
   const [inputError, setInputError] = useState<Error>({
-    password : false,
+    password: false,
     confirmPassword: false,
-    username : false
+    username: false
   });
   const [isLoading, setLoading] = useState<boolean>(false);
 
@@ -73,9 +70,9 @@ const Register: FunctionComponent<RegisterProps> = () => {
     const passwordValid = isPasswordValid(password);
     const passwordsMatch = doPasswordsMatch(password, confirmPassword);
     setInputError({
-      password : !passwordValid,
+      password: !passwordValid,
       confirmPassword: !passwordsMatch,
-      username : !usernameValid
+      username: !usernameValid
     });
     return usernameValid && passwordValid && passwordsMatch;
   };
@@ -87,7 +84,7 @@ const Register: FunctionComponent<RegisterProps> = () => {
     const confirmPassword = confirmPasswordRef.current?.value;
 
     if (!isFormValid(username, password, confirmPassword)) {
-      showToast("Invalid Entry - One of the entries below do not meet the requirements", "error", {autoClose: 10000});
+      showToast("Invalid Entry - One of the entries below do not meet the requirements", "error", { autoClose: 10000 });
       setLoading(false);
       return;
     }
@@ -104,11 +101,11 @@ const Register: FunctionComponent<RegisterProps> = () => {
     } catch (error) {
       const err = error as AxiosError;
       if (!err?.response) {
-        showToast("No Server Response", "error", {autoClose: 10000});
+        showToast("No Server Response", "error", { autoClose: 10000 });
       } else if (err.response?.status === 409) {
-        showToast("Username Taken", "error", {autoClose: 10000});
+        showToast("Username Taken", "error", { autoClose: 10000 });
       } else {
-        showToast(`Registration Failed - ${err.response?.data.message}`, "error", {autoClose: 10000});
+        showToast(`Registration Failed - ${err.response?.data.message}`, "error", { autoClose: 10000 });
       }
     }
     setLoading(false);
@@ -118,56 +115,56 @@ const Register: FunctionComponent<RegisterProps> = () => {
     <Container component="main" maxWidth="xs" sx={{
       display: "flex",
       flexDirection: "column",
-      alignItems:"center"
+      alignItems: "center"
     }}>
-        <Typography component="h1" sx={{ m: 2 }} variant="h5">
-          Register
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate>
-          <TextField
-            required
-            id="username"
-            label="Username"
-            inputRef={usernameRef}
-            fullWidth
-            autoComplete="username"
-            autoFocus
-            helperText={USERNAME_REQUIREMENT}
-            error={inputError.username}
-          />
+      <Typography component="h1" sx={{ m: 2 }} variant="h5">
+        Register
+      </Typography>
+      <Box component="form" onSubmit={handleSubmit} noValidate>
+        <TextField
+          required
+          id="username"
+          label="Username"
+          inputRef={usernameRef}
+          fullWidth
+          autoComplete="username"
+          autoFocus
+          helperText={USERNAME_REQUIREMENT}
+          error={inputError.username}
+        />
 
-          <HiddenInput
-            ref={passwordRef}
-            label="Password"
-            id="password"
-            autocomplete="new-password"
-            helperText={PASSWORD_REQUIREMENT}
-            error={inputError.password}
-          />
-          <HiddenInput
-            ref={confirmPasswordRef}
-            label="Confirm Password"
-            id="confirm-password"
-            autocomplete="new-password"
-            helperText={CONFIRM_PASSWORD_REQUIREMENT}
-            error={inputError.confirmPassword}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            <LoadingComponent isLoading={isLoading}>Register</LoadingComponent>
-          </Button>
-          <Grid container>
-            <Grid item>
-              <Link component={RouterLink} to="/login">
-                Already have an account? Login
-              </Link>
-            </Grid>
+        <HiddenInput
+          ref={passwordRef}
+          label="Password"
+          id="password"
+          autocomplete="new-password"
+          helperText={PASSWORD_REQUIREMENT}
+          error={inputError.password}
+        />
+        <HiddenInput
+          ref={confirmPasswordRef}
+          label="Confirm Password"
+          id="confirm-password"
+          autocomplete="new-password"
+          helperText={CONFIRM_PASSWORD_REQUIREMENT}
+          error={inputError.confirmPassword}
+        />
+        <LoadingButton
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+          loading={isLoading}
+          type="submit">
+          Register
+        </LoadingButton>
+        <Grid container>
+          <Grid item>
+            <Link component={RouterLink} to="/login">
+              Already have an account? Login
+            </Link>
           </Grid>
-        </Box>
+        </Grid>
+      </Box>
     </Container>
   );
 };

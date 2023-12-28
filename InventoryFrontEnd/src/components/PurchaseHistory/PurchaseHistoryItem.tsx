@@ -16,7 +16,7 @@ import { GetPurchaseEditLink } from "src/data/LinkConstants";
 import { useGetIndividualPurchaseOrder } from "src/hooks/usePurchaseRequests";
 
 interface PurchaseHistoryItemProps {
-  id: number;
+  id: string;
 }
 
 const PurchaseHistoryItem: FunctionComponent<PurchaseHistoryItemProps> = ({
@@ -28,7 +28,7 @@ const PurchaseHistoryItem: FunctionComponent<PurchaseHistoryItemProps> = ({
     isLoading,
     statusCode
   } = useGetIndividualPurchaseOrder(id);
-
+  
   if (isLoading) return <CircularProgress />;
   if (isError) return <pre>{error}</pre>;
   if (statusCode == 403 || !data) return <h3>Item does not exist</h3>;

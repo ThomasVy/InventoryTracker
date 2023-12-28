@@ -1,46 +1,77 @@
-import { Schema, model } from "mongoose";
-import {autoIncrement} from 'mongoose-plugin-autoinc';
+import { Schema, Types, model } from "mongoose";
 import { z } from "zod";
-import { FormatForExternal } from "../utils/FormatDataExternal";
+import { UserId } from "../types/user";
 
-const InventoryZodSchema = z.object({
-  id: z.number().optional(),
-  name: z.string(),
-  stock: z.number().positive(),
-  cost: z.number().positive(),
-  type: z.enum(["Poster", "Keychain", "Other"]),
+const inventoryEntitySchema = z.object({
+  _id: z.instanceof(Types.ObjectId),
+  userId: z.string().min(1),
+  tag: z.string().refine(s => !s.includes(' '), 'No Spaces Allowed in tag'),
+  name: z.string().min(1),
+  stock: z.number().nonnegative(),
+  cost: z.number().nonnegative(),
+  type: z.string().min(1),
   reference: z.string(),
   owner: z.string(),
-  imageLink: z.string().optional(),
-  userId: z.string()
-});
+  imageLink: z.string().default("http://localhost:4000/images/no-image-icon.png"),
+})
+const partialEntitySchema = inventoryEntitySchema.omit({ userId: true, _id: true }).partial();
+const inventoryDTOSchema = inventoryEntitySchema.omit({_id: true, userId: true}).merge(z.object({id: z.string()}));
+const inventoryDTOMiniSchema = inventoryDTOSchema.pick({id: true, tag: true, name: true});
+export type InventoryEntity = z.infer<typeof inventoryEntitySchema>;
+export type InventoryDTO = z.infer<typeof inventoryDTOSchema>;
+export type InventoryDTOMini = z.infer<typeof inventoryDTOMiniSchema>;
 
-export type InventoryTypeInternal = z.infer<typeof InventoryZodSchema>;
+export const InventoryEntity = {
+  convertToEntity({id, ...dto}: InventoryDTO, userId: UserId) {
+    const candidate : InventoryEntity = {
+        _id: new Types.ObjectId(id),
+        ...dto,
+        userId
+    }
+    return inventoryEntitySchema.parse(candidate);
+  },
+  convertToPartialEntity(dto: Omit<Partial<InventoryDTO>, "userId" | "id">) {
+    return partialEntitySchema.parse(dto);
+  },
+  convertKey(id: string, userId: string) {
+    return {
+      _id: new Types.ObjectId(id),
+      userId
+    }
+  }
+}
 
-export const InventoryZodExternal = FormatForExternal(InventoryZodSchema)
+export const InventoryDTO = {
+  convertToDTO({_id, ...entity}: InventoryEntity): InventoryDTO {
+      const candidate : InventoryDTO = {
+        id: _id.toHexString(),
+        ...entity
+      }
+      return inventoryDTOSchema.parse(candidate);
+  },
+  convertToMiniDTO({_id, tag, name}: InventoryEntity): InventoryDTOMini {
+    const candidate : InventoryDTOMini = {
+      id: _id.toHexString(),
+      tag,
+      name
+    };
+    return inventoryDTOMiniSchema.parse(candidate);
+  }
+}
 
-export type InventoryTypeExternal = z.infer<typeof InventoryZodExternal>;
-
-const inventorySchema = new Schema<InventoryTypeInternal>({
-  id: Number,
+const inventorySchema = new Schema<InventoryEntity>({
   userId: String,
+  tag: String,
   name: String,
   stock: Number,
   cost: Number,
   type: {
-    type: String,
-    enum: ["Poster", "Keychain", "Other"],
-    default: "Other",
+    type: String
   },
   reference: String,
   owner: String,
-  imageLink: {
-    type: String,
-    required: false,
-    default: "http://localhost:4000/images/no-image-icon.png",
-  },
+  imageLink: String
 });
 
-inventorySchema.plugin(autoIncrement, { model: 'Inventory', field: 'id', startAt: 1 });
-
-export default model("Inventory", inventorySchema);
+inventorySchema.index({'tag': 1, 'userId': 1}, {unique: true});
+export const Inventory = model("Inventory", inventorySchema);

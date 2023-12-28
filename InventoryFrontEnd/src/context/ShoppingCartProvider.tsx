@@ -5,13 +5,13 @@ import { PurchaseItemDetails } from "src/data/PurchaseConstants";
 
 
 interface ShoppingCartState {
-  getItemQuantity: (id: number) => number;
-  increaseCartQuantity: (id: number) => void;
-  addToCart: (id: number, individualPrice: number) => void;
-  decreaseCartQuantity: (id: number) => void;
-  removeFromCart: (id: number) => void;
+  getItemQuantity: (id: string) => number;
+  increaseCartQuantity: (id: string) => void;
+  addToCart: (id: string, individualPrice: number) => void;
+  decreaseCartQuantity: (id: string) => void;
+  removeFromCart: (id: string) => void;
   clearShoppingCart: () => void;
-  setItemPrice: (id: number, newPrice: number) => void;
+  setItemPrice: (id: string, newPrice: number) => void;
   openCart: () => void;
   closeCart: () => void;
   totalItemsInCart: number;
@@ -40,10 +40,10 @@ export const ShoppingCartProvider = ({
   );
 
   const clearShoppingCart = () => setShoppingCart([]);
-  const getItemQuantity = (id: number) => {
+  const getItemQuantity = (id: string) => {
     return shoppingCart.find((item) => item.id === id)?.quantity || 0;
   };
-  const increaseCartQuantity = (id: number) => {
+  const increaseCartQuantity = (id: string) => {
     setShoppingCart((prevItems) => {
       return prevItems.map((item) => {
         if (item.id === id) {
@@ -54,7 +54,7 @@ export const ShoppingCartProvider = ({
       });
     });
   };
-  const addToCart = (id: number, price: number) => {
+  const addToCart = (id: string, price: number) => {
     setShoppingCart((prevItems) => {
       if (!prevItems.find((item) => item.id === id)) {
         return [...prevItems, { id, quantity: 1, price }];
@@ -63,7 +63,7 @@ export const ShoppingCartProvider = ({
       return prevItems;
     });
   };
-  const decreaseCartQuantity = (id: number) => {
+  const decreaseCartQuantity = (id: string) => {
     setShoppingCart((prevItems) => {
       return prevItems.map((item) => {
         if (item.id === id) {
@@ -78,12 +78,12 @@ export const ShoppingCartProvider = ({
       });
     });
   };
-  const removeFromCart = (id: number) => {
+  const removeFromCart = (id: string) => {
     setShoppingCart((prevItems) => {
       return prevItems.filter((item) => item.id !== id);
     });
   };
-  const setItemPrice = (id: number, newPrice: number) => {
+  const setItemPrice = (id: string, newPrice: number) => {
       setShoppingCart((prevItems) =>
         prevItems.map((item) => {
           if (item.id === id) {

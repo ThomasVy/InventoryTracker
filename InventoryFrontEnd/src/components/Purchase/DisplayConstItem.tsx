@@ -3,6 +3,8 @@ import { FunctionComponent } from "react";
 import { PurchaseItemDetails } from "src/data/PurchaseConstants";
 import { useGetInventoryItem } from "src/hooks/useInventoryRequests";
 import { formatCurrency } from "src/utilities/formatCurrency";
+import LoadingComponent from "../LoadingComponent";
+import ErrorComponent from "../ErrorComponent";
 
 
 const DisplayConstItem: FunctionComponent<PurchaseItemDetails> = ({
@@ -11,10 +13,10 @@ const DisplayConstItem: FunctionComponent<PurchaseItemDetails> = ({
   price
 }) => {
   const { data, isLoading, isError, error } = useGetInventoryItem(id);
-  if (isLoading) return <CircularProgress />;
+  if (isLoading) return <LoadingComponent />
   if (isError) {
     console.log(`Item doesn't ${error}`);
-    return null;
+    return <ErrorComponent error={error} />;
   }
   return (
     <>

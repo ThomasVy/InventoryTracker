@@ -8,7 +8,7 @@ const REFRESH_URI = '/refresh';
 const useRefreshToken = () => {
     const { setAuth } = useAuth();
     const queryClient = useQueryClient();
-    const {clearShoppingCart} = useShoppingCart();
+    const {clearShoppingCart, closeCart} = useShoppingCart();
 
     const refresh = async () => {
         try {
@@ -16,12 +16,14 @@ const useRefreshToken = () => {
             if (response.status == 403) {
                 queryClient.removeQueries();
                 clearShoppingCart();
+                closeCart();
                 setAuth(null);
                 return null;
             }
             if (response.status == 201){
                 queryClient.removeQueries();
                 clearShoppingCart();
+                closeCart();
                 setAuth(null);
                 return null;
             }

@@ -9,3 +9,11 @@ export type PaginationResults<T> = {
 };
 
 export type PaginationControls = Omit<PaginationResults<void>, "results">;
+
+export type SearchReturn<T> = {
+    isLoading: boolean;
+    isError: boolean;
+    error: string;
+    statusCode?: number;
+    results?: PaginationResults<T>;
+};

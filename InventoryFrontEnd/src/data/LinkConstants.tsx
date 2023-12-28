@@ -13,10 +13,10 @@ export const REGISTER_LINK: Link = { title: "Register", link: "/register" };
 export const PURCHASE_HISTORY_LINK: Link = { title: "History", link: "/purchase-history" };
 export const PURCHASE_EDIT_LINK: Link = { title: "Edit Purchase Order", link: `${PURCHASE_HISTORY_LINK.link}/:purchaseId` };
 
-export function GetInventoryEditLink(id: number) {
+export function GetInventoryEditLink(id: string) {
   return `${INVENTORY_LINK.link}/${id}`;
 }
 
-export function GetPurchaseEditLink(id: number) {
+export function GetPurchaseEditLink(id: string) {
   return `${PURCHASE_HISTORY_LINK.link}/${id}`;
 }

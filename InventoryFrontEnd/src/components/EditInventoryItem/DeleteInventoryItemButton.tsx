@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { INVENTORY_LINK } from "src/data/LinkConstants";
 
 interface DeleteInventoryItemButtonProps {
-  id: number;
+  id: string;
 }
 
 const DeleteInventoryItemButton: FunctionComponent<DeleteInventoryItemButtonProps> = ({ id }) => {

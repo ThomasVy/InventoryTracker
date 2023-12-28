@@ -1,7 +1,6 @@
-import { Box, Button, CircularProgress, Stack, TextField, Typography } from "@mui/material";
+import { Box, MenuItem, Stack, TextField, Typography } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from "react-router-dom";
-import { z } from "zod";
 import NotFound from "./NotFound";
 import { useGetInventoryItem } from "src/hooks/useInventoryRequests";
 import CurrencyInput from "src/components/CurrencyInput";
@@ -12,6 +11,8 @@ import ConfirmationButton from "src/components/ConfirmationButton";
 import { INVENTORY_LINK } from "src/data/LinkConstants";
 import DeleteInventoryItemButton from "src/components/EditInventoryItem/DeleteInventoryItemButton";
 import WholeNumberInput from "src/components/WholeNumberInput";
+import LoadingComponent from "src/components/LoadingComponent";
+import ErrorComponent from "src/components/ErrorComponent";
 
 type EditInventoryItemPageProps = {
 };
@@ -20,21 +21,19 @@ function EditInventoryItemPage({ }: EditInventoryItemPageProps) {
     const navigate = useNavigate();
     const [inventoryItemState, setInventoryItemState] = useState<InventoryItemDetails>();
     const [isDirty, setIsDirty] = useState(false);
-    const itemIdZodResult = z.coerce.number().positive().safeParse(params.id);
-    if (!itemIdZodResult.success) return <NotFound />;
-    const itemId = itemIdZodResult.data;
+    const itemId = params.id;
+    
+    if (itemId == null) return <NotFound />;
     const { isLoading,
-        refetch,
         isError,
         error,
-        data } = useGetInventoryItem(itemId, { staleTime: Infinity, retry: 0, enabled: itemIdZodResult.success });
+        data } = useGetInventoryItem(itemId, { staleTime: Infinity, retry: 0, enabled: itemId != null });
 
     useEffect(() => {
         setInventoryItemState(data);
     }, [data]);
-
-    if (isLoading) return <CircularProgress />;
-    if (isError) return <pre>{error}</pre>;
+    if (isLoading) return <LoadingComponent />;
+    if (isError) return <ErrorComponent error={error} />;
     if (!inventoryItemState) return <NotFound />;
 
     const updateState = (name: string) => {
@@ -53,7 +52,7 @@ function EditInventoryItemPage({ }: EditInventoryItemPageProps) {
         updateState(name)(value);
     }
 
-    const { name, stock, cost, type, owner, reference } = inventoryItemState;
+    const { tag, name, stock, cost, type, owner, reference } = inventoryItemState;
     return (
         <>
             <Stack justifyContent="flex-end" gap={3}>
@@ -79,6 +78,15 @@ function EditInventoryItemPage({ }: EditInventoryItemPageProps) {
                 </Stack>
                 <Typography variant="h3">Edit Inventory Item {itemId}</Typography>
                 <Stack gap={2} >
+                    <Box display="flex" alignItems="center">
+                        <TextField
+                            label="Tag"
+                            name="tag"
+                            value={tag}
+                            onChange={handleChange}
+                            sx={{ width: "24ch" }}
+                        />
+                    </Box>
                     <Box display="flex" alignItems="center" gap={2}>
                         <TextField
                             label="Product Name"
@@ -95,13 +103,20 @@ function EditInventoryItemPage({ }: EditInventoryItemPageProps) {
                         />
                     </Box>
                     <Box display="flex" alignItems="center" gap={2}>
+
                         <TextField
-                            label="Type"
-                            name="type"
+                            select
+                            required
+                            label="Product Type"
                             value={type}
+                            name="type"
                             onChange={handleChange}
                             sx={{ width: "24ch" }}
-                        />
+                        >
+                            <MenuItem value="Poster">Poster</MenuItem>
+                            <MenuItem value="Keychain">Keychain</MenuItem>
+                            <MenuItem value="Other">Other</MenuItem>
+                        </TextField>
                         <WholeNumberInput
                             label="Stock"
                             sx={{ width: "24ch" }}

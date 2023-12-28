@@ -4,14 +4,14 @@ import { useUpdatePurchase } from 'src/hooks/usePurchaseRequests'
 import { showToast } from 'src/utilities/toast'
 
 type Props = {
-    purchaseId: number,
+    purchaseId: string,
     isDirty: boolean,
     setDirty: (value: boolean) => void,
     purchaseHistoryState: PurchaseOrder
 }
 
 const SaveEditPurchaseButton = ({ purchaseId, isDirty, setDirty, purchaseHistoryState }: Props) => {
-    const onSuccessFunc = (id: number) => {
+    const onSuccessFunc = (id: string) => {
         setDirty(false);
         showToast(`Successfully updated purchase order ${id}`, "success");
     }

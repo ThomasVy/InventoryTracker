@@ -7,9 +7,11 @@ import RenderItemPrice from "./RenderItemPrice";
 import { useGetInventoryItem } from "src/hooks/useInventoryRequests";
 import { ModifyingItemFuncs } from "src/data/ItemConstants";
 import { PurchaseItemDetails } from "src/data/PurchaseConstants";
+import LoadingComponent from "../LoadingComponent";
+import ErrorComponent from "../ErrorComponent";
 
 interface RenderItemProps extends PurchaseItemDetails {
-  modifyItemFuncs: (id: number) => ModifyingItemFuncs;
+  modifyItemFuncs: (id: string) => ModifyingItemFuncs;
 }
 
 const RenderItem: FunctionComponent<RenderItemProps> = ({
@@ -19,10 +21,10 @@ const RenderItem: FunctionComponent<RenderItemProps> = ({
   modifyItemFuncs
 }) => {
   const { data, isLoading, isError, error } = useGetInventoryItem(id);
-  if (isLoading) return <CircularProgress />;
+  if (isLoading) return <LoadingComponent />;
   if (isError) {
     console.log(`Item doesn't exist ${error}`);
-    return null;
+    return <ErrorComponent error={error} />;
   }
   const { decreaseQuantity, increaseQuantity, removeAllQuantity, setPrice } = modifyItemFuncs(id);
 
@@ -37,7 +39,7 @@ const RenderItem: FunctionComponent<RenderItemProps> = ({
       <Stack flexDirection="column" justifyContent="center" justifyItems="center">
         <Stack direction="row" alignItems="center">
           <Typography variant="subtitle1" color="text.secondary">
-            [ID# {id}]&nbsp;
+            [{data.tag}]&nbsp;
           </Typography>
           <Typography variant="h6" color={data.name ? "text.primary" : "text.secondary"}>
             {data.name ?? <i>(Item was deleted)</i>}

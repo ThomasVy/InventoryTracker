@@ -12,7 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const FIVE_MINUTES = 1000 * 60 * 5;
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: FIVE_MINUTES } },
+  defaultOptions: { queries: { staleTime: FIVE_MINUTES, retry: 0 } },
 });
 
 const darkTheme = createTheme({

@@ -1,18 +1,19 @@
 import express from "express";
-import { paginatedResults, searchTerm } from '../middleware/pagination';
-import PurchaseModel from "../model/PurchaseModel";
 import addPurchaseController from '../controllers/purchaseControllers/addPurchase';
 import listPurchasesController from '../controllers/purchaseControllers/listPurchases'
 import getPurchaseController from '../controllers/purchaseControllers/getPurchase'
 import handleUpdatePurchase from "../controllers/purchaseControllers/updatePurchase";
 import handleDeletePurchase from "../controllers/purchaseControllers/deletePurchase";
+import { PURCHASE_ID_PARAM } from "../types/purchasesTypes";
+
+
 const router = express.Router();
 
 router.post("/", addPurchaseController);
-router.get("/", searchTerm(PurchaseModel, "userId"), listPurchasesController);
+router.get("/", listPurchasesController);
 
-router.get("/:purchaseId", getPurchaseController);
-router.put("/:purchaseId", handleUpdatePurchase);
-router.delete("/:purchaseId", handleDeletePurchase);
+router.get(`/:${PURCHASE_ID_PARAM}`, getPurchaseController);
+router.put(`/:${PURCHASE_ID_PARAM}`, handleUpdatePurchase);
+router.delete(`/:${PURCHASE_ID_PARAM}`, handleDeletePurchase);
 
 export default router;

@@ -18,6 +18,7 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
   const [reference, setReference] = useState("");
   const [productType, setProductType] = useState("Poster");
   const [owner, setOwner] = useState(auth ? auth.username : "");
+  const [tag, setTag] = useState("");
   const onSuccessFunc = () => {
     setStock(0);
     setCost(0);
@@ -27,7 +28,7 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
     setProductType("Poster");
   }
   const onFailureFunc = (error: string) => {
-    showToast(`Failed to Add ${error}`, "error");
+    showToast(`Failed to Add - ${error}`, "error");
   }
   const { mutate, isPending } = useAddInventoryItem(onSuccessFunc, onFailureFunc);
   const handleAddInventory = (
@@ -35,13 +36,12 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
   ) => {
     e.preventDefault();
     if (!productName) return;
-    if (!stock) return;
-    if (!cost) return;
     if (!reference) return;
     if (!productType) return;
     if (!owner) return;
+    if (!tag) return;
     mutate({
-      itemId: -1,
+      tag,
       name: productName,
       stock: stock,
       cost: cost,
@@ -66,6 +66,12 @@ const AddInventory: FunctionComponent<AddInventoryProps> = () => {
       noValidate
       autoComplete="off"
     >
+      <TextField
+        required
+        value={tag}
+        onChange={(e) => setTag(e.target.value)}
+        label="Tag"
+      />
       <TextField
         required
         value={productName}

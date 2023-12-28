@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import PurchaseHistory from "./pages/PurchaseHistoryListPage.tsx";
 import EditPurchaseHistoryPage from "./pages/EditPurchaseHistoryPage.tsx";
 import EditInventoryItemPage from "./pages/EditInventoryItemPage.tsx";
+import LoadingComponent from "./components/LoadingComponent.tsx";
 
 //https://react.dev/learn/you-might-not-need-an-effect#initializing-the-application
 let didInit = false;
@@ -53,9 +54,7 @@ function App() {
   }, []);
   
   const isLoggedIn = auth;
-  if (isLoading) {
-    return <h2>Loading...</h2>;
-  }
+  if (isLoading) return <LoadingComponent />;
   
   return (
     <>

@@ -1,8 +1,10 @@
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
 import { FunctionComponent, useState } from "react";
 import { useGetPurchaseHistory } from "src/hooks/usePurchaseRequests";
 import PurchaseHistoryItem from "./PurchaseHistoryItem";
 import PurchaseHistoryPaginationControls from "./PurchaseHistoryPaginationControls";
+import LoadingComponent from "../LoadingComponent";
+import ErrorComponent from "../ErrorComponent";
 
 interface PurchaseHistoryListProps { 
   searchTerm: string
@@ -16,29 +18,29 @@ const PurchaseHistoryList: FunctionComponent<PurchaseHistoryListProps> = ({searc
     isError,
     error,
     statusCode,
-    data,
+    results,
   } = useGetPurchaseHistory(page, LIMIT, searchTerm);
 
-
-  if (isLoading) return <CircularProgress />;
-  if (isError) return <pre>{error}</pre>;
-  if (statusCode == 204 || !data) return <h3>No Purchases Available</h3>;
+  
+  if (isLoading) return <LoadingComponent />;
+  if (isError) return <ErrorComponent error={error} />;
+  if (statusCode == 204 || !results) return <h3>No Purchases Available</h3>;
   return (
     <>
-      <Box sx={{
+      <Box display="flex" flexDirection="column" gap={1} sx={{
         width: 3 / 4,
         maxWidth: "sm",
       }}
       >
-        {data.results.map((order) => <PurchaseHistoryItem key={order.id} id={order.id} />)}
+        {results.results.map((order) => <PurchaseHistoryItem key={order.id} id={order.id} />)}
       </Box>
       <PurchaseHistoryPaginationControls
-        page={data.page}
-        limit={data.limit}
-        totalItems={data.totalItems}
-        nextPage={data.nextPage}
-        maxPage={data.maxPage}
-        previousPage={data.previousPage}
+        page={results.page}
+        limit={results.limit}
+        totalItems={results.totalItems}
+        nextPage={results.nextPage}
+        maxPage={results.maxPage}
+        previousPage={results.previousPage}
         setPage={setPage}
       />
     </>

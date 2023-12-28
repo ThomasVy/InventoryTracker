@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Drawer,
   IconButton,
   Stack,
@@ -8,7 +7,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
 import useShoppingCart from "src/hooks/useShoppingCart";
 import CloseIcon from "@mui/icons-material/Close";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
@@ -35,7 +34,7 @@ const ShoppingCartDrawer: FunctionComponent<ShoppingCartDrawerProps> = ({
   const smallScreenProps = {
     sx: { width: "100vw" }
   }
-  const modifyingFuncs = (id: number): ModifyingItemFuncs => {
+  const modifyingFuncs = (id: string): ModifyingItemFuncs => {
     return {
       decreaseQuantity: () => {
         decreaseCartQuantity(id);

@@ -5,11 +5,14 @@ import {
   INVENTORY_ADD_API,
   INVENTORY_LIST_API,
   INVENTORY_REACT_QUERY_KEY,
+  InventoryMini,
   InventoryItemDetails,
+  InventoryItemsWithoutId,
 } from "src/data/InventoryConstants";
 import { AxiosError } from "axios";
+import { PaginationResults, SearchReturn } from "src/data/PaginationConstants";
 
-export function useGetInventory(page: number, limit: number, search?: string) {
+export function useGetInventory(page: number, limit: number, search: string): SearchReturn<InventoryMini> {
   const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
   const { isLoading, isError, error, data } = useQuery({
     queryKey: [
@@ -21,7 +24,7 @@ export function useGetInventory(page: number, limit: number, search?: string) {
       },
     ],
     queryFn: () => {
-      return privateInventoryRequest.get(INVENTORY_LIST_API, {
+      return privateInventoryRequest.get<PaginationResults<InventoryMini>>(INVENTORY_LIST_API, {
         params: {
           page,
           limit,
@@ -30,23 +33,13 @@ export function useGetInventory(page: number, limit: number, search?: string) {
       });
     },
   });
-  const statusCode = data?.data;
-  const results = data?.data.results;
-  const previousPage = data?.data.previousPage;
-  const nextPage = data?.data.nextPage;
-  const maxPage = data?.data.maxPage;
-  const totalItems = data?.data.totalItems;
 
   return {
     isLoading,
     isError,
     error: JSON.stringify(error),
-    statusCode,
-    results,
-    previousPage,
-    nextPage,
-    maxPage,
-    totalItems,
+    statusCode: data?.status,
+    results: data?.data
   };
 }
 
@@ -58,7 +51,7 @@ export function useAddInventoryItem(
   const queryClient = useQueryClient();
 
   const { isPending, mutate } = useMutation({
-    mutationFn: (item: InventoryItemDetails) => {
+    mutationFn: (item: InventoryItemsWithoutId) => {
       return privateInventoryRequest.post(
         INVENTORY_ADD_API,
         JSON.stringify(item)
@@ -70,49 +63,47 @@ export function useAddInventoryItem(
       });
       onSuccessFunc();
     },
-    onError: (error: Error) => {
-      onErrorFunc(JSON.stringify(error));
+    onError: (error: AxiosError) => {
+      onErrorFunc(error.response?.data.message);
     },
   });
 
   return { mutate, isPending };
 }
 
-export function useGetInventoryItem(id: number, option?: Partial<UndefinedInitialDataOptions>) {
+export function useGetInventoryItem(id: string, option?: Partial<UndefinedInitialDataOptions>) {
   const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
+
   const { isLoading, isError, error, data, refetch } = useQuery({
     queryKey: [INVENTORY_REACT_QUERY_KEY, id],
     queryFn: async () => {
-      return privateInventoryRequest.get(`${INVENTORY_LIST_API}/${id}`);
+      return privateInventoryRequest.get<InventoryItemDetails>(`${INVENTORY_LIST_API}/${id}`);
     },
     ...option
   });
-  const statusCode = data?.status ?? error?.response.status;
   const axiosData = data?.data;
   return {
     isLoading,
     refetch,
     isError,
     error: JSON.stringify(error),
-    statusCode,
     data: axiosData
   };
 }
 
 
-export function useSearchInventoryItem(id: number, onSuccessFunc?: (statusCode: number, res: any | undefined) => void) {
+export function useSearchInventoryTag(tag: string | undefined, onSuccessFunc: (data: InventoryItemDetails | undefined, statusCode: number) => void) {
   const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
   const { isLoading, refetch } = useQuery({
-    queryKey: [INVENTORY_REACT_QUERY_KEY, id],
+    queryKey: [INVENTORY_REACT_QUERY_KEY, tag],
     queryFn: async () => {
-      const res = await privateInventoryRequest.get(`${INVENTORY_LIST_API}/${id}`);
-      if (onSuccessFunc) onSuccessFunc(res.status, res.data);
+      const res = await privateInventoryRequest.get<InventoryItemDetails>(`${INVENTORY_LIST_API}/tag/${tag}`);
+      onSuccessFunc(res.data, res.status);
       return res;
     },
     enabled: false,
     refetchOnWindowFocus: false,
     retry: 0,
-    
   });
   return {
     isLoading,
@@ -120,7 +111,7 @@ export function useSearchInventoryItem(id: number, onSuccessFunc?: (statusCode: 
   };
 }
 
-export function useDeleteInventoryItem(id: number, onSuccessFunc: () => void, onErrorFunc: (error: string) => void) {
+export function useDeleteInventoryItem(id: string, onSuccessFunc: () => void, onErrorFunc: (error: string) => void) {
   const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
   const queryClient = useQueryClient();
   const { mutate, isPending, isError, error } = useMutation({
@@ -146,12 +137,12 @@ export function useDeleteInventoryItem(id: number, onSuccessFunc: () => void, on
   return { mutate, isLoading: isPending, isError, error: JSON.stringify(error) };
 }
 
-export function useUpdateInventory(id: number, onSuccessFunc: (id: number) => void, onErrorFunc: (error: string) => void) {
+export function useUpdateInventory(id: string, onSuccessFunc: (id: string) => void, onErrorFunc: (error: string) => void) {
   const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
   const queryClient = useQueryClient();
 
   const { isPending, mutate } = useMutation({
-    mutationFn: (item: InventoryItemDetails) => {
+    mutationFn: (item: InventoryItemsWithoutId) => {
       return privateInventoryRequest.put(
         `${INVENTORY_LIST_API}/${id}`,
         JSON.stringify({ item })
@@ -160,8 +151,8 @@ export function useUpdateInventory(id: number, onSuccessFunc: (id: number) => vo
     onSuccess: (data) => {
       if (data?.data) {
         queryClient.invalidateQueries({ queryKey: [INVENTORY_REACT_QUERY_KEY] })
-        const { itemId } = data?.data;
-        onSuccessFunc(itemId);
+        const { id } = data?.data;
+        onSuccessFunc(id);
       } else {
         onErrorFunc("No data was sent back");
       }

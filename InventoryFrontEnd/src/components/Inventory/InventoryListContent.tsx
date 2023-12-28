@@ -1,7 +1,6 @@
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
 import InventoryItem from "./InventoryItem";
 import {
-  CircularProgress,
   TableBody,
   TableCell,
   TableFooter,
@@ -9,33 +8,32 @@ import {
   TableRow,
 } from "@mui/material";
 import { CreateCustomPaginationActions } from "../CreateCustomPaginationActions";
-import { useGetInventory } from "src/hooks/useInventoryRequests";
+import { InventoryMini } from "src/data/InventoryConstants";
+import { PaginationResults } from "src/data/PaginationConstants";
 
 interface InventoryListContentProps {
-  searchTerm: string
+  handleChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  limit: number,
+  page: number,
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  results: PaginationResults<InventoryMini>,
 }
 const LIMIT_OPTIONS = [5, 10, 25, { label: "All", value: -1 }];
 
-const InventoryListContent: FunctionComponent<InventoryListContentProps> = ({searchTerm}) => {
-  const [limit, setLimit] = useState<number>(5);
-  const [page, setPage] = useState<number>(0);
-  const {
-    isLoading,
-    isError,
-    error,
-    statusCode,
-    results,
+const InventoryListContent: FunctionComponent<InventoryListContentProps> = ({
+  handleChangeRowsPerPage,
+  limit,
+  page,
+  results: {previousPage, nextPage, maxPage, results, totalItems},
+  setPage
+}) => {
+  const CustomPaginationActions = CreateCustomPaginationActions({
     previousPage,
     nextPage,
     maxPage,
-    totalItems,
-  } = useGetInventory(page, limit, searchTerm);
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setPage(0);
-    setLimit(parseInt(event.target.value, 10));
-  };
+    setPage,
+  });
+
   const fnDisplayAsSingleRowInTable = (ItemToBeDisplay: JSX.Element) => {
     return (
       <TableBody>
@@ -48,24 +46,15 @@ const InventoryListContent: FunctionComponent<InventoryListContentProps> = ({sea
     );
   };
 
-  if (isLoading) return fnDisplayAsSingleRowInTable(<CircularProgress />);
-  if (isError)
-    return fnDisplayAsSingleRowInTable(<pre>{error}</pre>);
-  if (statusCode == 204 || !results )
-    return fnDisplayAsSingleRowInTable(<h3>No inventories available</h3>);
-  const CustomPaginationActions = CreateCustomPaginationActions({
-    previousPage,
-    nextPage,
-    maxPage,
-    setPage,
-  });
-
+  if (results.length === 0) return fnDisplayAsSingleRowInTable(<h3>No inventory items available</h3>);
+  
   return (
     <>
       <TableBody>
-        {results.map(({id} : {id : number}) => (
-          <InventoryItem key={id} id={id} />
-        ))}
+        {results.map((a) => {
+          return <InventoryItem key={a.id} id={a.id} />
+        }
+        )}
       </TableBody>
       <TableFooter>
         <TableRow>

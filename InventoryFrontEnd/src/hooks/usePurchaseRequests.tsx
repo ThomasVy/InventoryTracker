@@ -1,11 +1,11 @@
 import useAuthPrivateRequest from "./usePrivateRequest";
 import backendRequest from "../api/backendRequest";
 import { UndefinedInitialDataOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PURCHASE_API, PURCHASE_LIST_KEY, PurchaseItemDetails, PurchaseOrder } from "src/data/PurchaseConstants";
+import { PURCHASE_API, PURCHASE_LIST_KEY, PurchaseItemDetails, PurchaseMini, PurchaseOrder } from "src/data/PurchaseConstants";
 import { AxiosError } from "axios";
-import { PaginationResults } from "src/data/PaginationConstants";
+import { PaginationResults, SearchReturn } from "src/data/PaginationConstants";
 
-export function useSendPurchaseOrder(onSuccessFunc: (id: number) => void, onErrorFunc: (error: string) => void) {
+export function useSendPurchaseOrder(onSuccessFunc: (id: string) => void, onErrorFunc: (error: string) => void) {
   const privatePurchaseRequest = useAuthPrivateRequest(backendRequest);
   const queryClient = useQueryClient();
 
@@ -35,7 +35,7 @@ export function useSendPurchaseOrder(onSuccessFunc: (id: number) => void, onErro
   return { mutate, isLoading: isPending };
 }
 
-export function useGetPurchaseHistory(page: number, limit: number, searchTerm: string) {
+export function useGetPurchaseHistory(page: number, limit: number, search: string): SearchReturn<PurchaseMini> {
   const privatePurchaseRequest = useAuthPrivateRequest(backendRequest);
   const { isLoading, isError, error, data } = useQuery({
     queryKey: [
@@ -43,15 +43,15 @@ export function useGetPurchaseHistory(page: number, limit: number, searchTerm: s
       {
         page,
         limit,
-        searchTerm
+        search
       },
     ],
     queryFn: () => {
-      return privatePurchaseRequest.get<PaginationResults<{id: number}>>(PURCHASE_API, {
+      return privatePurchaseRequest.get<PaginationResults<PurchaseMini>>(PURCHASE_API, {
         params: {
           page,
           limit,
-          searchTerm
+          search
         },
       });
     },
@@ -62,11 +62,11 @@ export function useGetPurchaseHistory(page: number, limit: number, searchTerm: s
     isError,
     error: JSON.stringify(error),
     statusCode: data?.status,
-    data: data?.data
+    results: data?.data
   };
 }
 
-export function useGetIndividualPurchaseOrder(id: number, option?: Partial<UndefinedInitialDataOptions>) {
+export function useGetIndividualPurchaseOrder(id: string, option?: Partial<UndefinedInitialDataOptions>) {
   const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
   const { isLoading, isError, error, data, refetch } = useQuery({
     queryKey: [PURCHASE_LIST_KEY, id],
@@ -81,13 +81,13 @@ export function useGetIndividualPurchaseOrder(id: number, option?: Partial<Undef
     isLoading,
     refetch,
     isError,
-    error: JSON.stringify(error),
+    error: error?.message ?? JSON.stringify(error),
     statusCode,
     data: axiosData
   };
 }
 
-export function useUpdatePurchase(id: number, onSuccessFunc: (id: number) => void, onErrorFunc: (error: string) => void) {
+export function useUpdatePurchase(id: string, onSuccessFunc: (id: string) => void, onErrorFunc: (error: string) => void) {
   const privatePurchaseRequest = useAuthPrivateRequest(backendRequest);
   const queryClient = useQueryClient();
 
@@ -115,7 +115,7 @@ export function useUpdatePurchase(id: number, onSuccessFunc: (id: number) => voi
   return { mutate, isLoading: isPending };
 }
 
-export function useDeletePurchase(id: number, onSuccessFunc: (id: number) => void, onErrorFunc: (error: string) => void) {
+export function useDeletePurchase(id: string, onSuccessFunc: (id: string) => void, onErrorFunc: (error: string) => void) {
   const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
   const queryClient = useQueryClient();
   const { mutate, isPending: isLoading } = useMutation({

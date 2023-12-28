@@ -8,8 +8,8 @@ import { PurchaseItemDetails } from 'src/data/PurchaseConstants';
 
 type Props = {
   items: PurchaseItemDetails[],
-  modifyItemFuncs : (id: number) => ModifyingItemFuncs;
-  addFunc: (id: number, price: number) => void;
+  modifyItemFuncs : (id: string) => ModifyingItemFuncs;
+  addFunc: (id: string, price: number) => void;
 } 
 
 function RenderListOfItems({ items, modifyItemFuncs, addFunc }: Props) {

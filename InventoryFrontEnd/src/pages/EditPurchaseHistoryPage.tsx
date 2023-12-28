@@ -12,7 +12,6 @@ import ConfirmationButton from '../components/ConfirmationButton';
 import SaveEditPurchaseButton from "src/components/EditPurchase/SaveEditPurchaseButton";
 import DeleteEditPurchaseButton from "src/components/EditPurchase/DeleteEditPurchaseButton";
 import EditPurchaseDatePicker from "src/components/EditPurchase/EditPurchaseDatePicker";
-import { z } from "zod";
 
 function EditPurchaseHistoryPage() {
     const params = useParams();
@@ -20,13 +19,12 @@ function EditPurchaseHistoryPage() {
     const [purchaseHistoryState, setPurchaseHistoryState] = useState<PurchaseOrder>();
     const navigate = useNavigate();
     
-    const purchaseIdZodResult = z.coerce.number().positive().safeParse(params.purchaseId);
-    if (!purchaseIdZodResult.success) return <NotFound />;
-    const purchaseId = purchaseIdZodResult.data;
+    const purchaseId = params.purchaseId;
+    if (purchaseId == undefined) return <NotFound />;
 
     const { data, error, isError, isLoading,
         statusCode
-    } = useGetIndividualPurchaseOrder(purchaseId, { staleTime: Infinity, retry: 0, enabled: purchaseIdZodResult.success  });
+    } = useGetIndividualPurchaseOrder(purchaseId, { staleTime: Infinity, retry: 0, enabled: purchaseId !== undefined });
     
     useEffect(() => {
         if (!data) return;
@@ -43,7 +41,7 @@ function EditPurchaseHistoryPage() {
         setIsDirty(true);
         setPurchaseHistoryState(modifyFunc);
     };
-    const modifyItemFunctions = (id: number) => {
+    const modifyItemFunctions = (id: string) => {
         return {
             decreaseQuantity: () => {
                 modifyPurchaseState(
@@ -111,7 +109,7 @@ function EditPurchaseHistoryPage() {
             }
         }
     }
-    const addFunc = (id: number, price: number) => {
+    const addFunc = (id: string, price: number) => {
         modifyPurchaseState((prevState) => {
             if (!prevState) return prevState;
             if (prevState.items.find((item) => item.id === id)) {

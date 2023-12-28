@@ -1,37 +1,54 @@
 import { LoadingButton } from "@mui/lab";
-import { Box, TextField } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { FunctionComponent, useState } from "react";
-import { useSearchInventoryItem } from "src/hooks/useInventoryRequests";
+import { InventoryItemDetails, InventoryMini } from "src/data/InventoryConstants";
+import { useGetInventory, useSearchInventoryTag } from "src/hooks/useInventoryRequests";
 import { showToast } from "src/utilities/toast";
+import SearchDropDown from "./SearchDropDown";
 
 interface AddByIdInputProps {
-  addFunc : (id: number, cost: number) => void;
+  addFunc : (id: string, cost: number) => void;
 }
 
 const AddByIdInput: FunctionComponent<
   AddByIdInputProps
 > = ({addFunc}) => {
-  const [itemId, setItemId] = useState<string>("");
-  const [isError, setIsError] = useState<boolean>(false);
-  const onSuccessFunc = (statusCode: number, res: any | undefined) => {
+  const [tag, setTag] = useState<InventoryMini|null>(null);
+  const onSuccessFunc = (data: InventoryItemDetails | undefined, statusCode: number) => {
     if (statusCode == 204) {
-      showToast(`Item ID ${itemId} is not a valid item`);
-      setIsError(true);
-    } else if (!res) {
+      showToast(`Item tag ${tag} is not a valid`);
+    } else if (!data) {
       showToast("There was no data from the server response");
-      setIsError(true);
     } else {
-      addFunc(parseInt(itemId), res.cost)
-      setItemId("")
+      addFunc(data.id, data.cost)
+      setTag(null)
     }
   }
-  const {isLoading, refetch} = useSearchInventoryItem(parseInt(itemId), onSuccessFunc);
+  const {isLoading, refetch} = useSearchInventoryTag(tag?.tag, onSuccessFunc);
 
   const submit = (e) => {
     e.preventDefault();
-    if (itemId != "")
-      refetch();
+    if (tag === null) {
+      showToast("Item doesn't exist", "error");
+      return;
+    }
+    refetch();
   };
+
+  const displayOptions = (option: InventoryMini) => {
+    return (
+      <>
+      {option.tag}
+        <Typography variant="body2" color="text.secondary">
+            {option.name}
+        </Typography>
+      </>
+    );
+  };
+  const displaySelected = (option: InventoryMini) => {
+    return option.tag
+  }
+
   return (
     <>
       <Box
@@ -44,25 +61,15 @@ const AddByIdInput: FunctionComponent<
           gap: 10,
         }}
       >
-        <TextField
-          required
-          error={isError}
-          disabled={isLoading}
-          value={itemId}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const alphaNumericRegex = /^[a-z0-9]+$/i;
-            if (event.target.value === ""){
-              setIsError(false);
-              setItemId(event.target.value);
-            }
-            else if (alphaNumericRegex.test(event.target.value)){
-              setItemId(event.target.value);
-            }
-          }}
-          label="Add an Item by ID"
+        <SearchDropDown 
+          displayOptions={displayOptions}
+          displaySelectedItem={displaySelected}
+          searchHook={useGetInventory}
+          setValue={setTag}
+          value={tag}
         />
         <LoadingButton type="submit" loading={isLoading} variant="contained">
-          Enter
+          Add
         </LoadingButton>
       </Box>
     </>

@@ -1,10 +1,10 @@
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
-import { GetInventoryEditLink, INVENTORY_LINK } from "src/data/LinkConstants";
+import { GetInventoryEditLink } from "src/data/LinkConstants";
 import EditIcon from "@mui/icons-material/Edit";
 
 type EditInventoryButtonProps = {
-    id: number
+    id: string
 };
 function EditInventoryButton({ id }: EditInventoryButtonProps) {
     return (

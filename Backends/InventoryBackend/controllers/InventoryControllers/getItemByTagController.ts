@@ -1,15 +1,15 @@
 import { Response } from "express";
 import { SendError } from "../../utils/ErrorHandling";
 import InventoryServices from "../../services/InventoryServices";
-import { InventoryIdRequest } from "../../types/inventoryTypes.";
+import { InventoryTagRequest } from "../../types/inventoryTypes.";
 
-const handleGetItem = async (req: InventoryIdRequest, res: Response) => {
+const handleGetItemByTag = async (req: InventoryTagRequest, res: Response) => {
   try {
     const {userId} = req;
-    const item = await InventoryServices.getInventoryItem(req.params.inventoryId, userId);
+    const item = await InventoryServices.getInventoryItemByTag(req.params.tag, userId);
     res.status(200).json(item);
   } catch (error) {
     SendError(res, error);
   }
 };
-export default handleGetItem;
+export default handleGetItemByTag;

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { PURCHASE_HISTORY_LINK } from 'src/data/LinkConstants';
 
 type DeleteEditPurchaseButtonProps = {
-    purchaseId: number
+    purchaseId: string
 };
 function DeleteEditPurchaseButton({purchaseId}: DeleteEditPurchaseButtonProps) {
     const navigate = useNavigate();

@@ -16,7 +16,7 @@ interface SubmitPurchaseOrderButtonProps {
  
 const SubmitPurchaseOrderButton: FunctionComponent<SubmitPurchaseOrderButtonProps> = ({shoppingCart, clearShoppingCart, closeCart}) => {
     const navigate = useNavigate();
-    const onSuccessSend = (id: number) => {
+    const onSuccessSend = (id: string) => {
         const handleClick = () => {
           closeCart()
           navigate({ pathname: GetPurchaseEditLink(id) });

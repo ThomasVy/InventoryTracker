@@ -4,7 +4,6 @@ import useAuth from "../hooks/useAuth";
 import authRequest from "../api/authRequest";
 import {
   Box,
-  Button,
   Container,
   Grid,
   TextField,
@@ -12,8 +11,8 @@ import {
   Typography,
 } from "@mui/material";
 import HiddenInput from "src/components/HiddenInput";
-import LoadingComponent from "src/components/LoadingComponent";
 import { showToast } from "src/utilities/toast";
+import { LoadingButton } from "@mui/lab";
 
 const LOGIN_URL = "/login";
 
@@ -88,14 +87,15 @@ function Login() {
           autocomplete="current-password"
           error={error}
         />
-        <Button
-          type="submit"
+        <LoadingButton
           fullWidth
           variant="contained"
           sx={{ mt: 3, mb: 2 }}
-        >
-          <LoadingComponent isLoading={isLoading}>Sign In</LoadingComponent>
-        </Button>
+          loading={isLoading}
+          type="submit"
+         >
+          Sign In
+         </LoadingButton>
         <Grid container>
           <Grid item>
             <Link component={RouterLink} to="/register">

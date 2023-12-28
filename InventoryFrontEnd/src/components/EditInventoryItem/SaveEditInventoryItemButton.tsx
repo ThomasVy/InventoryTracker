@@ -6,18 +6,18 @@ import { useNavigate } from "react-router-dom";
 import { INVENTORY_LINK } from '../../data/LinkConstants';
 
 type SaveEditInventoryItemButtonProps = {
-    id: number,
+    id: string,
     isDirty: boolean,
     inventoryState: InventoryItemDetails
 };
 function SaveEditInventoryItemButton({id, isDirty, inventoryState}: SaveEditInventoryItemButtonProps) {
     const navigate = useNavigate();
-    const onSuccessFunc = (id: number) => {
-        showToast(`Successfully updated Item ID ${id}`, "success");
+    const onSuccessFunc = (id: string) => {
+        showToast(`Successfully updated`, "success");
         navigate(INVENTORY_LINK.link);
     }
     const onErrorFunc = (error: string) => {
-        showToast(`An error occured while updating: ${error}`, "success");
+        showToast(`An error occured: ${error}`, "error");
     }
     
     const {mutate, isLoading} = useUpdateInventory(id, onSuccessFunc, onErrorFunc);

@@ -1,13 +1,10 @@
 import { Response, Request } from 'express';
 import { SendError } from '../../utils/ErrorHandling';
-import PurchaseModel from '../../model/PurchaseModel';
-import IdParser from '../../utils/IdParse';
-
+import PurchaseServices from '../../services/PurchaseServices';
 const handleDeletePurchase = async (req : Request, res : Response) => {
     try {
-        const id = IdParser.parse(req.params.purchaseId)
         const { userId } = req;
-        await PurchaseModel.deleteOne({id, userId})
+        await PurchaseServices.deletePurchase(req.params.purchaseId, userId);
         return res.sendStatus(200);
     } catch (error) {
         SendError(res, error);

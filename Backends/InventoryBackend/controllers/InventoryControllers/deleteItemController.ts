@@ -1,16 +1,12 @@
 import { Response, Request } from 'express';
-import InventoryModel from '../../model/InventoryModel';
 import { SendError } from '../../utils/ErrorHandling';
-import { StatusError } from '../../types/error';
+import InventoryServices from '../../services/InventoryServices';
+import { InventoryIdRequest } from '../../types/inventoryTypes.';
 
-const handleDeleteItem = async (req : Request, res : Response) => {
+const handleDeleteItem = async (req : InventoryIdRequest, res : Response) => {
     try {
-        const itemId = parseInt(req.params.itemId);
-        if (isNaN(itemId)) {
-            throw new StatusError("item id not supplied as a number", {statusCode: 403});
-        }
         const {userId} = req;
-        await InventoryModel.deleteOne({userId, id: itemId});
+        await InventoryServices.deleteInventoryItem(req.params.inventoryId, userId);
         return res.sendStatus(200);
     } catch (error) {
         SendError(res, error);
