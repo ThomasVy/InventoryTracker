@@ -1,6 +1,7 @@
 import { Inventory, InventoryDTO, InventoryEntity } from '../model/InventoryModel';
 import { StatusError } from '../types/error';
 import { UserId } from "../types/user";
+import parseSearch from '../utils/SearchParse';
 
 async function createInventoryItem(dto: InventoryDTO, userId: UserId) {
     const candidate = InventoryEntity.convertToEntity(dto, userId);
@@ -48,50 +49,56 @@ async function updateInventoryItem(id: string, dto: Partial<InventoryDTO>, userI
     }
 }
 
-async function getNumberOfInventoryItem(userId: string, search: string) {
-    return await Inventory.countDocuments({
-        userId,
-        "$or": [{
-            name: {
-                $regex: search,
-                $options: "i"
-            }
-        }, {
-            tag: {
-                $regex: search,
-                $options: "i"
-            }
-        }]
-    });
+function getNumberOfInventoryItem(UnparsedSearch: string) {
+    const search = parseSearch(UnparsedSearch);
+    return async (userId: string) => {
+        return await Inventory.countDocuments({
+            userId,
+            "$or": [{
+                name: {
+                    $regex: search,
+                    $options: "i"
+                }
+            }, {
+                tag: {
+                    $regex: search,
+                    $options: "i"
+                }
+            }]
+        });
+    }
 }
 
-async function getInventory(userId: string, search: string, limit?: number, skip?: number) {
-    const query = Inventory.find({
-        userId,
-        "$or": [{
-            tag: {
-                $regex: search,
-                $options: "i"
-            }
-        }, {
-            name: {
-                $regex: search,
-                $options: "i"
-            }
-        }]
-    });
-    
-    if (skip != null) {
-        query.skip(skip);
+function getInventory(UnparsedSearch: string) {
+    const search = parseSearch(UnparsedSearch);
+    return async (userId: string, limit?: number, skip?: number) => {
+        const query = Inventory.find({
+            userId,
+            "$or": [{
+                tag: {
+                    $regex: search,
+                    $options: "i"
+                }
+            }, {
+                name: {
+                    $regex: search,
+                    $options: "i"
+                }
+            }]
+        });
+        
+        if (skip != null) {
+            query.skip(skip);
+        }
+        if (limit != null) {
+            query.limit(limit);
+        }
+        const inventoryItems = await query;
+        const inventoryDTO = inventoryItems.map((item) => {
+            return InventoryDTO.convertToMiniDTO(item);
+        });
+        return inventoryDTO;
     }
-    if (limit != null) {
-        query.limit(limit);
-    }
-    const inventoryItems = await query;
-    const inventoryDTO = inventoryItems.map((item) => {
-        return InventoryDTO.convertToMiniDTO(item);
-    });
-    return inventoryDTO;
 }
 
 export default {

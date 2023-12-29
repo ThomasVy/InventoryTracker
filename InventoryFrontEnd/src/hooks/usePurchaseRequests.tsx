@@ -4,6 +4,7 @@ import { UndefinedInitialDataOptions, useMutation, useQuery, useQueryClient } fr
 import { PURCHASE_API, PURCHASE_LIST_KEY, PurchaseItemDetails, PurchaseMini, PurchaseOrder } from "src/data/PurchaseConstants";
 import { AxiosError } from "axios";
 import { PaginationResults, SearchReturn } from "src/data/PaginationConstants";
+import { getPurchasesWithItem } from "src/utilities/purchasesRequests";
 
 export function useSendPurchaseOrder(onSuccessFunc: (id: string) => void, onErrorFunc: (error: string) => void) {
   const privatePurchaseRequest = useAuthPrivateRequest(backendRequest);
@@ -51,7 +52,7 @@ export function useGetPurchaseHistory(page: number, limit: number, search: strin
         params: {
           page,
           limit,
-          search
+          payload: {search}
         },
       });
     },
@@ -139,4 +140,29 @@ export function useDeletePurchase(id: string, onSuccessFunc: (id: string) => voi
   });
 
   return { mutate, isLoading };
+}
+
+export function useGetPurchasesWithItem(page: number, limit: number, itemId: string, option?: Partial<UndefinedInitialDataOptions>) {
+  const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
+  const { isLoading, isError, error, data } = useQuery({
+    queryKey: [
+      PURCHASE_LIST_KEY,
+      {
+        page,
+        limit,
+        itemId
+      },
+    ],
+    queryFn: () => {
+      return getPurchasesWithItem(privateInventoryRequest, itemId, page, limit);
+    },
+    ...option
+  });
+  
+  return {
+    isLoading,
+    isError,
+    error: JSON.stringify(error),
+    results: data
+  };
 }

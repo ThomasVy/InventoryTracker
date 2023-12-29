@@ -76,7 +76,7 @@ function EditInventoryItemPage({ }: EditInventoryItemPageProps) {
                         Inventory
                     </ConfirmationButton>
                 </Stack>
-                <Typography variant="h3">Edit Inventory Item {itemId}</Typography>
+                <Typography variant="h3">Edit Inventory Item</Typography>
                 <Stack gap={2} >
                     <Box display="flex" alignItems="center">
                         <TextField

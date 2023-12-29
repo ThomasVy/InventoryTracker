@@ -8,7 +8,7 @@ import { FunctionComponent, ReactNode } from 'react';
 
 interface ConfirmationDialogProps {
     open : boolean;
-    setOpen : React.Dispatch<React.SetStateAction<boolean>>
+    setOpen : (state: boolean) => void;
     title? : string;
     onConfirm: () => void;
     children?: ReactNode

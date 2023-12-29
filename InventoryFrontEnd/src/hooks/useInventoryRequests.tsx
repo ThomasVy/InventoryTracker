@@ -28,7 +28,7 @@ export function useGetInventory(page: number, limit: number, search: string): Se
         params: {
           page,
           limit,
-          search
+          payload:{search}
         },
       });
     },
@@ -114,6 +114,7 @@ export function useSearchInventoryTag(tag: string | undefined, onSuccessFunc: (d
 export function useDeleteInventoryItem(id: string, onSuccessFunc: () => void, onErrorFunc: (error: string) => void) {
   const privateInventoryRequest = useAuthPrivateRequest(backendRequest);
   const queryClient = useQueryClient();
+
   const { mutate, isPending, isError, error } = useMutation({
     mutationFn: () => {
       return privateInventoryRequest.delete(`${INVENTORY_LIST_API}/${id}`);
@@ -132,6 +133,7 @@ export function useDeleteInventoryItem(id: string, onSuccessFunc: () => void, on
     onError: (error: AxiosError) => {
       onErrorFunc(error.response?.data?.message);
     },
+    
   });
 
   return { mutate, isLoading: isPending, isError, error: JSON.stringify(error) };

@@ -21,7 +21,7 @@ const purchaseDTOSchema = purchaseEntitySchema.omit({_id: true, userId: true}).m
 export type PurchaseDTO = z.infer<typeof purchaseDTOSchema>;
 
 const purchaseDTOMiniSchema = purchaseDTOSchema.pick({id: true});
-type PurchaseDTOMini = z.infer<typeof purchaseDTOMiniSchema>;
+export type PurchaseDTOMini = z.infer<typeof purchaseDTOMiniSchema>;
 
 export const PurchaseDTO = {
     convertFromEntity({_id, ...entity}: PurchaseEntity): PurchaseDTO {
