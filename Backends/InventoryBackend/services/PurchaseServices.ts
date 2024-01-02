@@ -48,7 +48,20 @@ async function updatePurchase(id: string, dto: Omit<Partial<PurchaseDTO>, "id">,
 function getTotalNumberOfPurchases(UnparsedSearch: string) {
     const search = parseSearch(UnparsedSearch);
     return async (userId: string) => {
-        return await Purchase.countDocuments({ userId });
+        const results = await Purchase.aggregate([            
+            { $addFields: { convertedId: { $toString: "$_id" } } },
+            {
+                $match: {
+                    convertedId: {
+                        $regex: search,
+                        $options: "i"
+                    },
+                    userId
+                }
+            },
+            { $count: "totalCount" }
+        ]);
+        return results[0] ? results[0].totalCount as number : 0;
     }
 }
 
